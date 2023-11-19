@@ -7,10 +7,14 @@ import currentWeather
 app = Flask(__name__)
 
 @app.route('/')
-def main():
+def index():
     if request.method == 'POST':
-        # Odbierz dane od front-endu (miasto)
+        #Odbierz dane od front-endu (miasto)
+    
         city = request.get_json()['city']
         currentWeather.getCurrentWeather(city)
     else:
         return render_template('main.html')
+
+if __name__ == '__main__':
+    app.run(debug=True)
