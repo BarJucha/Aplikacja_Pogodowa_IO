@@ -23,38 +23,36 @@
 
         </div>
         <div class="middle"></div>
-        <div class="weatherIcon">
-            <img src="assets/icons/day/113.png" width="256px" height="256px" alt="Weather state">
-        </div>
+        <div class="weatherIcon">TBA</div>
     </div>
 
-    <div class="container">
-        <div class="left">
+    <div class="infoContainer">
+        <div class="userPanel">
             <button onclick="document.getElementById('id01').style.display='block'" style="width:auto; border: none; background: none;">
                 <img src="assets/profile_icon.png" alt="Icon" class="icon">
             </button>
         </div>
-        <div class="middle">
+        <div class="middlePanel">
             <div class="box"></div>
             <div class="box"></div>
         </div>
-        <div class="right"></div>
+        <div class="futureWeather"></div>
     </div>
 
     <div id="id01" class="loginDialog">
 
-        <form class="modal-content animate" action="/action_page.php" method="post">
+        <form class="loginWindow animate">
             <div class="loginImg">
                 <span onclick="document.getElementById('id01').style.display='none'" class="close" title="Close Modal">&times;</span>
                 <img src="assets/profile_icon.png" alt="Avatar" class="avatar">
             </div>
 
             <div class="loginCredentials">
-                <label><b>Username</b></label>
-                <input type="text" placeholder="Enter Username" name="uname" required>
+                <label for="email"><b>E-mail:</b></label>
+                <input type="email" placeholder="Enter Email" name="email" id="email" required>
 
-                <label><b>Password</b></label>
-                <input type="password" placeholder="Enter Password" name="psw" required>
+                <label for="password"><b>Password</b></label>
+                <input type="password" placeholder="Enter Password" name="psw" id="password" required>
 
                 <button type="submit" class="loginButton" onclick="login()">Login</button>
                 <br>

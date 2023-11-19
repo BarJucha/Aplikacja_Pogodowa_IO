@@ -38,7 +38,7 @@ body {
 
 /* Dolny układ strony */
 
-.container {
+.infoContainer {
     display: flex;
     justify-content: space-between;
     align-items: flex-end;
@@ -46,13 +46,13 @@ body {
     margin: 0 5% 5%;
 }
 
-.left {
+.userPanel {
     width: 10%;
     height: 100%;
     background-color: rgb(220, 220, 220, 0.5);
 }
 
-.middle {
+.middlePanel {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -68,13 +68,13 @@ body {
     background-color: rgb(220, 220, 220, 0.5);
 }
 
-.right {
+.futureWeather {
     width: 30%;
     height: 100%;
     background-color: rgb(220, 220, 220, 0.5);
 }
 
-.left, .middle, .right, .box {
+.userPanel, .middlePanel, .futureWeather, .box {
     border-radius: 20px;
 }
 
@@ -107,7 +107,7 @@ body {
     padding-top: 60px;
 }
 
-input[type=text], input[type=password] {
+input[type=email], input[type=password] {
     width: 100%;
     padding: 16px 20px;
     margin: 8px 0;
@@ -127,9 +127,9 @@ input[type=text], input[type=password] {
     to {transform: scale(1)}
 }
 
-.modal-content {
+.loginWindow {
     background-color: #fefefe;
-    margin: 5px auto; /* 15% from the top and centered */
+    margin: 5px auto;
     border: 1px solid #888;
     width: 50%;
     position: relative;
