@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="mainStyles.css">
+
+</head>
+<body>
+
+    <div class="weatherContainer">
+        <div class="cityInfo">
+            <div>
+                <button>Nazwa_miasta (rozwijana lista)</button>
+            </div>
+            <div>
+                <h1>Warunki pogodowe</h1>
+            </div>
+            <div>
+                <h1> Temperatura </h1>
+                <h2> Miasto, data </h2>
+            </div>
+
+        </div>
+        <div class="middle"></div>
+        <div class="weatherIcon">
+            <img src="assets/icons/day/113.png" width="256px" height="256px" alt="Weather state">
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="left">
+            <button onclick="document.getElementById('id01').style.display='block'" style="width:auto; border: none; background: none;">
+                <img src="assets/profile_icon.png" alt="Icon" class="icon">
+            </button>
+        </div>
+        <div class="middle">
+            <div class="box"></div>
+            <div class="box"></div>
+        </div>
+        <div class="right"></div>
+    </div>
+
+    <div id="id01" class="loginDialog">
+
+        <form class="modal-content animate" action="/action_page.php" method="post">
+            <div class="loginImg">
+                <span onclick="document.getElementById('id01').style.display='none'" class="close" title="Close Modal">&times;</span>
+                <img src="assets/profile_icon.png" alt="Avatar" class="avatar">
+            </div>
+
+            <div class="loginCredentials">
+                <label><b>Username</b></label>
+                <input type="text" placeholder="Enter Username" name="uname" required>
+
+                <label><b>Password</b></label>
+                <input type="password" placeholder="Enter Password" name="psw" required>
+
+                <button type="submit" class="loginButton" onclick="login()">Login</button>
+                <br>
+                <button type="submit" class="loginButton" onclick="register()" style="background-color: #107b54">Register</button>
+            </div>
+        </form>
+    </div>
+
+
+    <script src="mainScripts.js"></script>
+</body>
+</html>
