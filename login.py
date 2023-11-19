@@ -1,5 +1,5 @@
 import dataBase
-from flask import Flask, request, session, redirect, url_for
+from flask import Flask, request, session, redirect, url_for, jsonify
 import hashlib
 import os
 
@@ -17,8 +17,9 @@ def hash_password(password, salt):
 
 @app.route('/login', methods = ['POST'])
 def login():
-    email = request.form.get('email')
-    password = request.form.get('password')
+    data = request.get_json()
+    email = data['email']
+    password = data['password']
 
     # Pobierz informacje o użytkowniku z bazy danych
     query = "SELECT * FROM uzytkownik WHERE email = %s"
@@ -33,9 +34,12 @@ def login():
             # Zaloguj użytkownika i ustaw informacje o nim w sesji
             session['user_id'] = user['id']
             session['user_email'] = user['email']
-            return "Zalogowano pomyślnie"
-
-    return "Błąd logowania"
+            response_data = {'success': True, 'message': 'Zalogowano pomyślnie'}
+        else:
+            response_data = {'success': False, 'message': 'Użytkownik o podanym email istnieje.'}
+    else:
+        response_data = {'success': False, 'message': 'Użytkownik o podanym email istnieje.'}
+    return jsonify(response_data)
 
 @app.route('/logout')
 def logout():
@@ -45,8 +49,9 @@ def logout():
 
 @app.route('/register', methods=['POST'])
 def register():
-    email = request.form.get('email')
-    password = request.form.get('password')
+    data = request.get_json()
+    email = data['email']
+    password = data['password']
 
     # Sprawdź, czy użytkownik o podanym email już istnieje
     query_check_existing_user = "SELECT userID FROM uzytkownik WHERE email = %s"
@@ -55,7 +60,9 @@ def register():
     existing_user = cursor_existing_user.fetchone()
 
     if existing_user:
-        return "Użytkownik o podanym adresie e-mail już istnieje."
+        response_data = {'success': False, 'message': 'Użytkownik o podanym email istnieje.'}
+    else:
+        response_data = {'success': True, 'message': 'Zarejestrowano poprawnie.'}
 
     # Wygeneruj unikalną sól dla każdego użytkownika
     salt = generate_salt()
@@ -64,8 +71,8 @@ def register():
     hashed_password = hash_password(password, salt)
 
     # Zapisz użytkownika do bazy danych
-    query_register_user = "INSERT INTO uzytkownik (email, password, salt) VALUES (%s, %s, %s)"
+    query_register_user = "INSERT INTO uzytkownik (email, password, tlo, salt) VALUES (%s, %s, blue, %s)"
     data_register_user = (email, hashed_password, salt)
     db_connection.execute_query(query_register_user, data_register_user)
 
-    return "Zarejestrowano pomyślnie"
+    return jsonify(response_data)
