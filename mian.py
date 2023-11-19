@@ -11,6 +11,6 @@ def main():
     if request.method == 'POST':
         # Odbierz dane od front-endu (miasto)
         city = request.get_json()['city']
-
-
-    return render_template('main.html')
+        currentWeather.getCurrentWeather(city)
+    else:
+        return render_template('main.html')
