@@ -75,8 +75,8 @@ def register():
             hashed_password = hash_password(password, salt)
 
         # Zapisz użytkownika do bazy danych
-            query_register_user = "INSERT INTO uzytkownik (email, password, tlo, salt) VALUES (%s, %s, blue, %s)"
-            data_register_user = (email, hashed_password, salt)
+            query_register_user = "INSERT INTO uzytkownik (email, haslo, tlo, salt) VALUES (%s, %s, %s, %s)"
+            data_register_user = (email, hashed_password,'yellow', salt)
             db_connection.execute_query(query_register_user, data_register_user)
             response_data = {'success':True, 'message':'Użytkownik poprawnie się zarejestrował'}
 
