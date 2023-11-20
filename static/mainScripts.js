@@ -45,13 +45,12 @@ function login() {
     .then(data => {
         console.log(data);
         // Obsługa odpowiedzi z serwera
-        isLoggedIn = true;
-        updateUI();
-        toggleForms();
     })
     .catch(error => {
         console.error('Błąd:', error);
     });
+    isLoggedIn = true;
+    toggleForms();
 }
 
 
@@ -97,9 +96,11 @@ function toggleForms() {
 
     if (isLoggedIn) {
         loginForm.style.display = 'none';
+        //document.getElementById('settings').style.display = 'block';
         logoutForm.style.display = 'block';
     } else {
         loginForm.style.display = 'block';
+        //document.getElementById('settings').style.display = 'none';
         logoutForm.style.display = 'none';
     }
 
@@ -125,11 +126,22 @@ function getWeather() {
 }
 
 window.onload = function() {
-    getWeather();
+   //getWeather();
 };
 
 function updateUI() {
     alert("Udalo sie!");
+}
+
+function changeTheme(selectedTheme) {
+    const themeColors = {
+        light: '#ffffff',
+        dark: '#333333',
+        sky: '#87CEEB',
+        nature: '#228B22'
+    };
+
+    document.body.style.backgroundColor = themeColors[selectedTheme];
 }
 
 

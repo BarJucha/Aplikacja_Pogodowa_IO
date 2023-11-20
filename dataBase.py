@@ -32,3 +32,19 @@ class DataBaseConnection:
         if 'connection' in locals() and self.connection.is_connected():
             self.connection.close()
             print('Połączenie z bazą danych zamknięte')
+
+    def execute_query(self, query, data=None):
+        cursor = self.connection.cursor(dictionary=True)
+        try:
+            cursor.execute(query, data)
+            result = cursor.fetchall()  # Fetch all results
+
+            self.connection.commit()
+            return cursor, result  # Return both cursor and fetched results
+
+        except mysql.connector.Error as err:
+            print(f'Błąd: {err}')
+
+        finally:
+            if 'cursor' in locals():
+                cursor.close()
