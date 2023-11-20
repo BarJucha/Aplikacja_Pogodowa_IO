@@ -78,6 +78,7 @@ def register():
             query_register_user = "INSERT INTO uzytkownik (email, password, tlo, salt) VALUES (%s, %s, blue, %s)"
             data_register_user = (email, hashed_password, salt)
             db_connection.execute_query(query_register_user, data_register_user)
+            response_data = {'success':True, 'message':'Użytkownik poprawnie się zarejestrował'}
 
         print(response_data)
         return jsonify(response_data)
