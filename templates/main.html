@@ -12,18 +12,21 @@
 <div class="weatherContainer">
     <div class="cityInfo">
         <div id="searchContainer">
-            Tu będzie wyszukiwarka na miasta
+            <form action="/submitCity" method="post">
+            <label for="Miasto">Wpisz miasto:</label>
+            <input type="text", id="city", name="city" value="">
+        </form>
         </div>
         <div>
-            <h1 id="conditionHeader">Warunki pogodowe</h1>
+            <h1 id="conditionHeader">Warunki pogodowe: {{ warunki }}</h1>
         </div>
         <div>
-            <h1 id="temperatureHeader">Temperatura</h1>
-            <h2 id="cityDateHeader">Miasto, data</h2>
+            <h1 id="temperatureHeader">Temperatura: {{ temp }}</h1>
+            <h2 id="cityDateHeader">Miasto, data: {{ miasto }}, {{ data }}</h2>
         </div>
     </div>
     <div class="middle"></div>
-    <div class="weatherIcon">TBA</div>
+    <div class="weatherIcon">{{ icon }}</div>
 </div>
 
 <div class="infoContainer">
@@ -72,8 +75,5 @@
     </form>
 
 </div>
-
-
-<script type="text/javascript" src="/static/mainScripts.js"></script>
 </body>
 </html>
