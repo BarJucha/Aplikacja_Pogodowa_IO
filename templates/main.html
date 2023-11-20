@@ -17,13 +17,13 @@
         </form>
         </div>
         <div>
-            <h1 id="conditionHeader">{{ warunki }}</h1>
-            <h1 id="temperatureHeader">{{ temp }} (stopni/dodać Fahrenheit)</h1>
             <h2 id="cityDateHeader">{{ miasto }}, {{ data }}</h2>
+            <h2 id="temperatureHeader">{{ temp }} (stopni/dodać Fahrenheit)</h2>
+            <img src={{ icon }} alt="Weather Icon"><h2 id="conditionHeader" style="display: inline-block;">{{ warunki }}</h2>
         </div>
     </div>
     <div class="middle"></div>
-    <div class="weatherIcon"><img src={{ icon }} alt="Weather Icon"></div>
+
 </div>
 
 <div class="infoContainer">
@@ -83,9 +83,9 @@
 
 
 <div id="id02" class="loginDialog">
-    <form class="loginWindow animate" id="settingsForm" style="display:block; height: auto">
+    <form class="loginWindow animate" id="settingsForm" style="display:block; height: 40%">
         <div class="themeSelector">
-            <span onclick="document.getElementById('settingsForm').style.display='none'" class="close" title="Close Modal">&times;</span>
+            <span onclick="document.getElementById('id02').style.display='none'" class="close" title="Close Modal">&times;</span>
             <label for="themeSelect">Choose a theme:</label>
             <select id="themeSelect" onchange="changeTheme(this.value)">
                 <option value="light">Light</option>
