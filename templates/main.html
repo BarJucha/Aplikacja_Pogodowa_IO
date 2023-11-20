@@ -2,68 +2,78 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
-    <link rel="stylesheet" href="mainStyles.css">
+    <title>Weather App</title>
+    <link rel="stylesheet" type="text/css" href="/static/mainStyles.css">
+
 
 </head>
 <body>
 
-    <div class="weatherContainer">
-        <div class="cityInfo">
-            <div>
-                <button>Nazwa_miasta (rozwijana lista)</button>
-            </div>
-            <div>
-                <h1>Warunki pogodowe</h1>
-            </div>
-            <div>
-                <h1> Temperatura </h1>
-                <h2> Miasto, data </h2>
-            </div>
-
+<div class="weatherContainer">
+    <div class="cityInfo">
+        <div id="searchContainer">
+            Tu będzie wyszukiwarka na miasta
         </div>
-        <div class="middle"></div>
-        <div class="weatherIcon">
-            <img src="assets/icons/day/113.png" width="256px" height="256px" alt="Weather state">
+        <div>
+            <h1 id="conditionHeader">Warunki pogodowe</h1>
+        </div>
+        <div>
+            <h1 id="temperatureHeader">Temperatura</h1>
+            <h2 id="cityDateHeader">Miasto, data</h2>
         </div>
     </div>
+    <div class="middle"></div>
+    <div class="weatherIcon">TBA</div>
+</div>
 
-    <div class="container">
-        <div class="left">
-            <button onclick="document.getElementById('id01').style.display='block'" style="width:auto; border: none; background: none;">
-                <img src="assets/profile_icon.png" alt="Icon" class="icon">
-            </button>
-        </div>
-        <div class="middle">
-            <div class="box"></div>
-            <div class="box"></div>
-        </div>
-        <div class="right"></div>
+<div class="infoContainer">
+    <div class="userPanel">
+        <button onclick="toggleForms()" style="width:auto; border: none; background: none;">
+            <img src="/static/assets/profile_icon.png" alt="Icon" class="icon">
+        </button>
     </div>
-
-    <div id="id01" class="loginDialog">
-
-        <form class="modal-content animate" action="/action_page.php" method="post">
-            <div class="loginImg">
-                <span onclick="document.getElementById('id01').style.display='none'" class="close" title="Close Modal">&times;</span>
-                <img src="assets/profile_icon.png" alt="Avatar" class="avatar">
-            </div>
-
-            <div class="loginCredentials">
-                <label><b>Username</b></label>
-                <input type="text" placeholder="Enter Username" name="uname" required>
-
-                <label><b>Password</b></label>
-                <input type="password" placeholder="Enter Password" name="psw" required>
-
-                <button type="submit" class="loginButton" onclick="login()">Login</button>
-                <br>
-                <button type="submit" class="loginButton" onclick="register()" style="background-color: #107b54">Register</button>
-            </div>
-        </form>
+    <div class="middlePanel">
+        <div class="box"></div>
+        <div class="box"></div>
     </div>
+    <div class="futureWeather"></div>
+</div>
+
+<div id="id01" class="loginDialog">
+
+    <form class="loginWindow animate" id="loginForm">
+        <div class="loginImg">
+            <span onclick="document.getElementById('id01').style.display='none'" class="close" title="Close Modal">&times;</span>
+            <img src="/static/assets/profile_icon.png" alt="Avatar" class="avatar">
+        </div>
+
+        <div class="loginCredentials">
+            <label for="email"><b>E-mail:</b></label>
+            <input type="email" placeholder="Enter Email" name="email" id="email" required>
+
+            <label for="password"><b>Password</b></label>
+            <input type="password" placeholder="Enter Password" name="psw" id="password" required>
+
+            <button type="button" class="loginButton" onclick="login()">Login</button>
+            <br>
+            <button type="button" class="loginButton" onclick="register()" style="background-color: #107b54">Register</button>
+        </div>
+    </form>
+
+    <form class="loginWindow animate" id="logoutForm" style="display:none;">
+        <div class="loginImg">
+            <span onclick="document.getElementById('id01').style.display='none'" class="close" title="Close Modal">&times;</span>
+            <img src="/static/assets/profile_icon.png" alt="Avatar Icon" class="avatar">
+        </div>
+        <div class="loginCredentials">
+            <p>Welcome, User!</p>
+            <button type="button" class="loginButton" onclick="logout()">Logout</button>
+        </div>
+    </form>
+
+</div>
 
 
-    <script src="mainScripts.js"></script>
+<script type="text/javascript" src="/static/mainScripts.js"></script>
 </body>
 </html>

@@ -3,7 +3,9 @@ from flask import Flask, request, session, redirect, url_for, jsonify
 import hashlib
 import os
 
-app = Flask(__name__)
+
+
+app = Flask(__name__, static_url_path='/static')
 app.secret_key = 'klucz_sesji'
 
 db_connection = dataBase.DataBaseConnection()
@@ -11,11 +13,13 @@ db_connection = dataBase.DataBaseConnection()
 def generate_salt():
     return os.urandom(16).hex()
 
+
 def hash_password(password, salt):
     hashed_password = hashlib.sha256((password + salt).encode('utf-8')).hexdigest()
     return hashed_password
 
-@app.route('/login', methods = ['POST'])
+
+@app.route('/login', methods=['POST'])
 def login():
     data = request.get_json()
     email = data['email']
@@ -41,11 +45,13 @@ def login():
         response_data = {'success': False, 'message': 'Użytkownik o podanym email istnieje.'}
     return jsonify(response_data)
 
+
 @app.route('/logout')
 def logout():
     # Wyloguj użytkownika i wyczyść sesję
     session.clear()
     return redirect(url_for('login'))
+
 
 @app.route('/register', methods=['POST'])
 def register():

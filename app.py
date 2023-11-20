@@ -4,7 +4,9 @@ import hashlib
 import os
 import login
 import currentWeather
-app = Flask(__name__)
+app = Flask(__name__, static_url_path='/static')
+
+app.secret_key = 'klucz_sesji'
 
 @app.route('/')
 def index():
