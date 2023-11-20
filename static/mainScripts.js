@@ -48,16 +48,6 @@ function login() {
             toggleForms();
         }
     })
-        .catch(error => console.error('Error:', error));
-=======
-        // Obsługa odpowiedzi z serwera
-    })
-    .catch(error => {
-        console.error('Błąd:', error);
-    });
-    isLoggedIn = true;
-    toggleForms();
->>>>>>> 1f8d10fec959756d620f93679877db521c4820d0
 }
 
 
