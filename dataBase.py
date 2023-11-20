@@ -15,8 +15,8 @@ class DataBaseConnection:
             print('Połączono z bazą danych')
 
     def execute_query(self, query, data=None):
+        cursor = self.connection.cursor(dictionary=True)
         try:
-            cursor = self.connection.cursor(dictionary=True)
             cursor.execute(query, data)
             self.connection.commit()
             return cursor

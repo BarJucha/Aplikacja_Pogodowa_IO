@@ -1,9 +1,9 @@
 import dataBase
-from flask import Flask, request, session, redirect, url_for, jsonify
+from flask import Blueprint, Flask, request, session, redirect, url_for, jsonify
 import hashlib
 import os
 
-
+login_blueprint = Blueprint('login', __name__)
 
 app = Flask(__name__, static_url_path='/static')
 app.secret_key = 'klucz_sesji'
@@ -19,7 +19,7 @@ def hash_password(password, salt):
     return hashed_password
 
 
-@app.route('/login', methods=['POST'])
+@login_blueprint.route('/login', methods=['POST'])
 def login():
     data = request.get_json()
     email = data['email']
@@ -46,14 +46,14 @@ def login():
     return jsonify(response_data)
 
 
-@app.route('/logout')
+@login_blueprint.route('/logout')
 def logout():
     # Wyloguj użytkownika i wyczyść sesję
     session.clear()
     return redirect(url_for('login'))
 
 
-@app.route('/register', methods=['POST'])
+@login_blueprint.route('/register', methods=['POST'])
 def register():
     data = request.get_json()
     email = data['email']

@@ -5,10 +5,12 @@ import os
 import login
 import currentWeather
 import requests
+
+from login import login_blueprint
 app = Flask(__name__, static_url_path='/static')
 
 app.secret_key = 'klucz_sesji'
-
+app.register_blueprint(login_blueprint)
 @app.route('/')
 def index():
     return render_template('main.html')
@@ -47,3 +49,4 @@ def submitWeather():
 
 if __name__ == '__main__':
     app.run(debug=True)
+    #db_connection.close_connection()
