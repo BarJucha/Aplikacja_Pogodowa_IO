@@ -16,7 +16,7 @@ body {
     justify-content: space-between;
     align-items: flex-end;
     margin: 5% 5% 5%;
-    background-color: aqua;
+    /*background-color: aqua;*/
 }
 
 
@@ -26,7 +26,7 @@ body {
     justify-content: space-between;
     width: 50%;
     height: 100%;
-    background-color: chocolate;
+    /*background-color: chocolate;*/
 }
 
 .weatherIcon {

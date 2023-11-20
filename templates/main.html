@@ -13,20 +13,17 @@
     <div class="cityInfo">
         <div id="searchContainer">
             <form action="/submitCity" method="post">
-            <label for="city"> Wpisz miasto:</label>
-            <input type="text" id="city" name="city" value="">
+            <input type="text" id="city" name="city" placeholder="Wpisz miasto..." value="">
         </form>
         </div>
         <div>
-            <h1 id="conditionHeader">Warunki pogodowe: {{ warunki }}</h1>
-        </div>
-        <div>
-            <h1 id="temperatureHeader">Temperatura: {{ temp }}</h1>
-            <h2 id="cityDateHeader">Miasto, data: {{ miasto }}, {{ data }}</h2>
+            <h1 id="conditionHeader">{{ warunki }}</h1>
+            <h1 id="temperatureHeader">{{ temp }} (stopni/dodać Fahrenheit)</h1>
+            <h2 id="cityDateHeader">{{ miasto }}, {{ data }}</h2>
         </div>
     </div>
     <div class="middle"></div>
-    <div class="weatherIcon">{{ icon }}</div>
+    <div class="weatherIcon"><img src={{ icon }} alt="Weather Icon"></div>
 </div>
 
 <div class="infoContainer">
@@ -63,11 +60,11 @@
             <input type="password" placeholder="Enter Password" name="psw" id="password" required>
 
             <form>
-                <button type="submit" class="loginButton" onclick="login()">Login</button>
+                <button type="button" class="loginButton" onclick="login()">Login</button>
             </form>
             <br>
             <form>
-                <button type="submit" class="loginButton" style="background-color: #107b54" onclick="register()">Register</button>
+                <button type="button" class="loginButton" style="background-color: #107b54" onclick="register()">Register</button>
             </form>
         </div>
     </div>

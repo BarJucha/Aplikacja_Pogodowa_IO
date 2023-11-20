@@ -96,11 +96,11 @@ function toggleForms() {
 
     if (isLoggedIn) {
         loginForm.style.display = 'none';
-        //document.getElementById('settings').style.display = 'block';
+        document.getElementById('settings').style.display = 'block';
         logoutForm.style.display = 'block';
     } else {
         loginForm.style.display = 'block';
-        //document.getElementById('settings').style.display = 'none';
+        document.getElementById('settings').style.display = 'none';
         logoutForm.style.display = 'none';
     }
 
@@ -125,9 +125,7 @@ function getWeather() {
         });
 }
 
-window.onload = function() {
-   //getWeather();
-};
+
 
 function updateUI() {
     alert("Udalo sie!");
