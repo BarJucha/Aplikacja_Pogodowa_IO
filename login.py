@@ -28,21 +28,20 @@ def login():
     # Pobierz informacje o użytkowniku z bazy danych
     query = "SELECT * FROM uzytkownik WHERE email = %s"
     data = (email,)
-    cursor = db_connection.execute_query(query, data)
-    user = cursor.fetchone()
+    cursor, user = db_connection.execute_query(query, data)
 
     if user:
         # Sprawdź poprawność hasła
-        hashed_password = hash_password(password, user['salt'])
-        if hashed_password == user['password']:
+        hashed_password = hash_password(password, user[0]['salt'])
+        if hashed_password == user[0]['haslo']:
             # Zaloguj użytkownika i ustaw informacje o nim w sesji
-            session['user_id'] = user['id']
-            session['user_email'] = user['email']
             response_data = {'success': True, 'message': 'Zalogowano pomyślnie'}
         else:
-            response_data = {'success': False, 'message': 'Użytkownik o podanym email istnieje.'}
+            response_data = {'success': False, 'message': 'Użytkownik o podanym email istnieje, ale błędne hasło.'}
     else:
-        response_data = {'success': False, 'message': 'Użytkownik o podanym email istnieje.'}
+        response_data = {'success': False, 'message': 'Użytkownik o podanym email nie istnieje.'}
+        
+    print(response_data)
     return jsonify(response_data)
 
 
@@ -76,7 +75,7 @@ def register():
             hashed_password = hash_password(password, salt)
 
             # Zapisz użytkownika do bazy danych
-            query_register_user = "INSERT INTO uzytkownik (email, password, tlo, salt) VALUES (%s, %s, 'blue', %s)"
+            query_register_user = "INSERT INTO uzytkownik (email, haslo, tlo, salt) VALUES (%s, %s, 'yellow', %s)"
             data_register_user = (email, hashed_password, salt)
             db_connection.execute_query(query_register_user, data_register_user)
 

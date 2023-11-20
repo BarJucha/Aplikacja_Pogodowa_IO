@@ -16,7 +16,7 @@ body {
     justify-content: space-between;
     align-items: flex-end;
     margin: 5% 5% 5%;
-    background-color: aqua;
+    /*background-color: aqua;*/
 }
 
 
@@ -26,7 +26,7 @@ body {
     justify-content: space-between;
     width: 50%;
     height: 100%;
-    background-color: chocolate;
+    /*background-color: chocolate;*/
 }
 
 .weatherIcon {
@@ -182,4 +182,12 @@ input[type=email], input[type=password] {
 
 .loginButton:hover {
     opacity: 80%;
+}
+
+.themeSelector {
+    background-color: #fefefe;
+    margin: 5px auto;
+    border: 1px solid #888;
+    width: 50%;
+    position: relative;
 }
