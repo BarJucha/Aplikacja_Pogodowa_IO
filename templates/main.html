@@ -13,20 +13,17 @@
     <div class="cityInfo">
         <div id="searchContainer">
             <form action="/submitCity" method="post">
-            <label for="Miasto">Wpisz miasto:</label>
-            <input type="text", id="city", name="city" value="">
+            <input type="text" id="city" name="city" placeholder="Wpisz miasto..." value="">
         </form>
         </div>
         <div>
-            <h1 id="conditionHeader">Warunki pogodowe: {{ warunki }}</h1>
-        </div>
-        <div>
-            <h1 id="temperatureHeader">Temperatura: {{ temp }}</h1>
-            <h2 id="cityDateHeader">Miasto, data: {{ miasto }}, {{ data }}</h2>
+            <h1 id="conditionHeader">{{ warunki }}</h1>
+            <h1 id="temperatureHeader">{{ temp }} (stopni/dodać Fahrenheit)</h1>
+            <h2 id="cityDateHeader">{{ miasto }}, {{ data }}</h2>
         </div>
     </div>
     <div class="middle"></div>
-    <div class="weatherIcon">{{ icon }}</div>
+    <div class="weatherIcon"><img src={{ icon }} alt="Weather Icon"></div>
 </div>
 
 <div class="infoContainer">
@@ -34,6 +31,11 @@
         <button onclick="toggleForms()" style="width:auto; border: none; background: none;">
             <img src="/static/assets/profile_icon.png" alt="Icon" class="icon">
         </button>
+
+        <button onclick="document.getElementById('id02').style.display='block'" style="width:auto; border: none; background: none;">
+            <img src="/static/assets/gear.png" alt="Icon" class="icon" style="display:none; border: none" id="settings">
+        </button>
+
     </div>
     <div class="middlePanel">
         <div class="box"></div>
@@ -44,7 +46,7 @@
 
 <div id="id01" class="loginDialog">
 
-    <form class="loginWindow animate" id="loginForm" action="/login" method="post">
+    <div class="loginWindow animate" id="loginForm">
         <div class="loginImg">
             <span onclick="document.getElementById('id01').style.display='none'" class="close" title="Close Modal">&times;</span>
             <img src="/static/assets/profile_icon.png" alt="Avatar" class="avatar">
@@ -57,23 +59,45 @@
             <label for="password"><b>Password</b></label>
             <input type="password" placeholder="Enter Password" name="psw" id="password" required>
 
-            <button type="submit" class="loginButton" onclick="login()">Login</button>
+            <form>
+                <button type="button" class="loginButton" onclick="login()">Login</button>
+            </form>
             <br>
-            <button type="submit" class="loginButton" onclick="register()" style="background-color: #107b54">Register</button>
+            <form>
+                <button type="button" class="loginButton" style="background-color: #107b54" onclick="register()">Register</button>
+            </form>
         </div>
-    </form>
+    </div>
 
-    <form class="loginWindow animate" id="logoutForm" style="display:none;" action="/login" method="post">
+    <form class="loginWindow animate" id="logoutForm" style="display:none;" action="/logout" method="post">
         <div class="loginImg">
             <span onclick="document.getElementById('id01').style.display='none'" class="close" title="Close Modal">&times;</span>
             <img src="/static/assets/profile_icon.png" alt="Avatar Icon" class="avatar">
         </div>
         <div class="loginCredentials">
             <p>Welcome, User!</p>
-            <button type="submit" class="loginButton" onclick="logout()">Logout</button>
+            <button type="button" class="loginButton" onclick="logout()">Logout</button>
         </div>
     </form>
-
 </div>
+
+
+<div id="id02" class="loginDialog">
+    <form class="loginWindow animate" id="settingsForm" style="display:block; height: auto">
+        <div class="themeSelector">
+            <span onclick="document.getElementById('settingsForm').style.display='none'" class="close" title="Close Modal">&times;</span>
+            <label for="themeSelect">Choose a theme:</label>
+            <select id="themeSelect" onchange="changeTheme(this.value)">
+                <option value="light">Light</option>
+                <option value="dark">Dark</option>
+                <option value="sky">Sky</option>
+                <option value="nature">Nature</option>
+            </select>
+        </div>
+    </form>
+</div>
+
+<script type="text/javascript" src="/static/mainScripts.js"></script>
+
 </body>
 </html>

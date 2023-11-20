@@ -13,7 +13,8 @@ app.secret_key = 'klucz_sesji'
 app.register_blueprint(login_blueprint)
 @app.route('/')
 def index():
-    return render_template('main.html')
+    return currentWeather('Cracow')
+
 
 @app.route('/currentWeather/<string:city>')
 def currentWeather(city):

@@ -55,30 +55,35 @@ def logout():
 
 @login_blueprint.route('/register', methods=['POST'])
 def register():
-    data = request.get_json()
-    email = data['email']
-    password = data['password']
+    try:
+        data = request.get_json()
+        email = data.get('email')
+        password = data.get('password')
 
-    # Sprawdź, czy użytkownik o podanym email już istnieje
-    query_check_existing_user = "SELECT userID FROM uzytkownik WHERE email = %s"
-    data_check_existing_user = (email,)
-    cursor_existing_user = db_connection.execute_query(query_check_existing_user, data_check_existing_user)
-    existing_user = cursor_existing_user.fetchone()
+        # Sprawdź, czy użytkownik o podanym email już istnieje
+        query_check_existing_user = "SELECT userID FROM uzytkownik WHERE email = %s"
+        data_check_existing_user = (email,)
 
-    if existing_user:
-        response_data = {'success': False, 'message': 'Użytkownik o podanym email istnieje.'}
-    else:
-        response_data = {'success': True, 'message': 'Zarejestrowano poprawnie.'}
+        cursor_existing_user, existing_user = db_connection.execute_query(query_check_existing_user, data_check_existing_user)
 
-    # Wygeneruj unikalną sól dla każdego użytkownika
-    salt = generate_salt()
+        if existing_user:
+            response_data = {'success': False, 'message': 'Użytkownik o podanym email już istnieje.'}
+        else:
+            # Wygeneruj unikalną sól dla każdego użytkownika
+            salt = generate_salt()
 
-    # Wygeneruj skrót hasła
-    hashed_password = hash_password(password, salt)
+            # Wygeneruj skrót hasła
+            hashed_password = hash_password(password, salt)
 
-    # Zapisz użytkownika do bazy danych
-    query_register_user = "INSERT INTO uzytkownik (email, password, tlo, salt) VALUES (%s, %s, blue, %s)"
-    data_register_user = (email, hashed_password, salt)
-    db_connection.execute_query(query_register_user, data_register_user)
+            # Zapisz użytkownika do bazy danych
+            query_register_user = "INSERT INTO uzytkownik (email, password, tlo, salt) VALUES (%s, %s, 'blue', %s)"
+            data_register_user = (email, hashed_password, salt)
+            db_connection.execute_query(query_register_user, data_register_user)
 
-    return jsonify(response_data)
+            response_data = {'success': True, 'message': 'Zarejestrowano poprawnie.'}
+
+        return jsonify(response_data)
+
+    except Exception as e:
+        print(f"Błąd podczas rejestracji: {e}")
+        return jsonify({'success': False, 'message': 'Wystąpił błąd podczas rejestracji.'})
