@@ -48,3 +48,8 @@ class DataBaseConnection:
         finally:
             if 'cursor' in locals():
                 cursor.close()
+
+    def close_connection(self):
+        if 'connection' in locals() and self.connection.is_connected():
+            self.connection.close()
+            print('Połączenie z bazą danych zamknięte')
