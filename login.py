@@ -74,11 +74,12 @@ def register():
             # Wygeneruj skrót hasła
             hashed_password = hash_password(password, salt)
 
-    # Zapisz użytkownika do bazy danych
-        query_register_user = "INSERT INTO uzytkownik (email, password, tlo, salt) VALUES (%s, %s, blue, %s)"
-        data_register_user = (email, hashed_password, salt)
-        db_connection.execute_query(query_register_user, data_register_user)
+        # Zapisz użytkownika do bazy danych
+            query_register_user = "INSERT INTO uzytkownik (email, password, tlo, salt) VALUES (%s, %s, blue, %s)"
+            data_register_user = (email, hashed_password, salt)
+            db_connection.execute_query(query_register_user, data_register_user)
 
+        print(response_data)
         return jsonify(response_data)
 
     except Exception as e:
