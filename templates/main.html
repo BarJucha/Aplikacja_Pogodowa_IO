@@ -41,7 +41,7 @@
 
 <div id="id01" class="loginDialog">
 
-    <form class="loginWindow animate" id="loginForm">
+    <form class="loginWindow animate" id="loginForm" action="/login" method="post">
         <div class="loginImg">
             <span onclick="document.getElementById('id01').style.display='none'" class="close" title="Close Modal">&times;</span>
             <img src="/static/assets/profile_icon.png" alt="Avatar" class="avatar">
@@ -54,20 +54,20 @@
             <label for="password"><b>Password</b></label>
             <input type="password" placeholder="Enter Password" name="psw" id="password" required>
 
-            <button type="button" class="loginButton" onclick="login()">Login</button>
+            <button type="submit" class="loginButton" onclick="login()">Login</button>
             <br>
-            <button type="button" class="loginButton" onclick="register()" style="background-color: #107b54">Register</button>
+            <button type="submit" class="loginButton" onclick="register()" style="background-color: #107b54">Register</button>
         </div>
     </form>
 
-    <form class="loginWindow animate" id="logoutForm" style="display:none;">
+    <form class="loginWindow animate" id="logoutForm" style="display:none;" action="/login" method="post">
         <div class="loginImg">
             <span onclick="document.getElementById('id01').style.display='none'" class="close" title="Close Modal">&times;</span>
             <img src="/static/assets/profile_icon.png" alt="Avatar Icon" class="avatar">
         </div>
         <div class="loginCredentials">
             <p>Welcome, User!</p>
-            <button type="button" class="loginButton" onclick="logout()">Logout</button>
+            <button type="submit" class="loginButton" onclick="logout()">Logout</button>
         </div>
     </form>
 
