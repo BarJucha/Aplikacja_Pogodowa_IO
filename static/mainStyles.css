@@ -193,10 +193,49 @@ input[type=email], input[type=password] {
     opacity: 80%;
 }
 
-.themeSelector {
-    background-color: #fefefe;
-    margin: 5px auto;
-    border: 1px solid #888;
-    width: 50%;
-    position: relative;
+/* Styl dla podtytułów */
+.themeSelector label {
+    display: block;
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+/* Styl dla przycisku zamykającego okno */
+.themeSelector .close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 30px;
+    cursor: pointer;
+}
+
+/* Styl dla listy wysuwanej */
+.themeSelector select {
+    width: 100%;
+    padding: 8px;
+    font-size: 14px;
+    margin-bottom: 20px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+/* Dodatkowe style dla opcji listy */
+.themeSelector option {
+    font-size: 14px;
+}
+
+.settingTitle {
+    font-size: 20px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.settingTitle {
+    width: 100%;
+    margin-left: 0;
+    margin-top: 0;
+    background-color: #91A3B0;
 }

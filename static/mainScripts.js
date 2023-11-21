@@ -1,4 +1,4 @@
-var loginDialog = document.getElementById('loginForm');
+let loginDialog = document.getElementById('loginForm');
 
 let isLoggedIn = false;
 let sessionId = -1;
@@ -9,9 +9,6 @@ window.onclick = function(event) {
     }
 }
 
-
-
-const base_url = 'http://127.0.0.1:5000';
 
 function login() {
     const emailInput = document.getElementById('email');
@@ -49,6 +46,9 @@ function login() {
             changeTheme(data.backgroundColor);
             sessionId = data.sesja;
         }
+        else {
+            alert(data.message);
+        }
     })
         .catch(error => console.error('Error:', error));
 }
@@ -83,14 +83,17 @@ function register() {
             isLoggedIn = true;
             toggleForms();
         }
+        else {
+            alert(data.message);
+        }
     })
         .catch(error => console.error('Error:', error));
 }
 
 function logout() {
     isLoggedIn = false;
-    sessionId = -1;
     toggleForms();
+    changeTheme("light");
 
 }
 
@@ -113,29 +116,6 @@ function toggleForms() {
 }
 
 
-
-/*
-function getWeather() {
-
-    fetch('/weather')
-        .then(response => response.json())
-        .then(data => {
-            // document.getElementById('cityButton').innerText = data.city;
-            document.getElementById('conditionHeader').innerText = `Warunki pogodowe: ${data.condition}`;
-            document.getElementById('temperatureHeader').innerText = `Temperatura: ${data.temperature}°C`;
-            document.getElementById('cityDateHeader').innerText = `${data.city}, ${new Date().toLocaleDateString()}`;
-        })
-        .catch(error => {
-            console.error('Error:', error);
-        });
-}
-*/
-
-
-function updateUI() {
-    alert("Udalo sie!");
-}
-
 function changeTheme(selectedTheme) {
     const themeColors = {
         light: '#e6c50f',
@@ -145,7 +125,20 @@ function changeTheme(selectedTheme) {
     };
 
     document.body.style.backgroundColor = themeColors[selectedTheme];
-    submitBackground(selectedTheme);
+
+    const h2Elements = document.querySelectorAll('h2');
+
+    h2Elements.forEach((h2) => {
+        if (selectedTheme === "dark") {
+            h2.style.color = '#f0f8ff';
+        } else {
+            h2.style.color = '';
+        }
+    });
+
+    if(isLoggedIn){
+        submitBackground(selectedTheme);
+    }
 }
 
 function getWeather(miasto) {
