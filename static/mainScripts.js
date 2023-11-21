@@ -134,9 +134,9 @@ function updateUI() {
 
 function changeTheme(selectedTheme) {
     const themeColors = {
-        light: '#ffffff',
+        light: '#e6c50f',
         dark: '#333333',
-        sky: '#87CEEB',
+        sky: '#87ceeb',
         nature: '#228B22'
     };
 
