@@ -35,7 +35,10 @@ def login():
         hashed_password = hash_password(password, user[0]['salt'])
         if hashed_password == user[0]['haslo']:
             # Zaloguj użytkownika i ustaw informacje o nim w sesji
-            response_data = {'success': True, 'message': 'Zalogowano pomyślnie'}
+            #return redirect(url_for('user_id', userID=int(user[0]['userID'])))
+            backgroundColor = user[0]['tlo']
+            session['user_id'] = user[0]['userID']
+            response_data = {'success': True, 'message': 'Zalogowano pomyślnie', 'backgroundColor':backgroundColor, 'sesja': session['user_id']}
         else:
             response_data = {'success': False, 'message': 'Użytkownik o podanym email istnieje, ale błędne hasło.'}
     else:
@@ -49,7 +52,7 @@ def login():
 def logout():
     # Wyloguj użytkownika i wyczyść sesję
     session.clear()
-    return redirect(url_for('login'))
+    return redirect(url_for('/'))
 
 
 @login_blueprint.route('/register', methods=['POST'])
@@ -76,9 +79,18 @@ def register():
 
         # Zapisz użytkownika do bazy danych
             query_register_user = "INSERT INTO uzytkownik (email, haslo, tlo, salt) VALUES (%s, %s, %s, %s)"
-            data_register_user = (email, hashed_password,'yellow', salt)
+            data_register_user = (email, hashed_password,'light', salt)
             db_connection.execute_query(query_register_user, data_register_user)
+            """query = "SELECT * FROM uzytkownik WHERE email = %s"
+            data_to_get_id = (email,)
+            cursor, user = db_connection.execute_query(query,data_to_get_id)
+            userID = int(user[0]['userID'])
+            return redirect(url_for('user_id', userID=userID))"""
             response_data = {'success':True, 'message':'Użytkownik poprawnie się zarejestrował'}
+            query = "SELECT userID FROM uzytkownik WHERE email = %s"
+            data_to_set_session = (email,)
+            cursor_existing_user, user_id_S = db_connection.execute_query(query, data_to_set_session)
+            session['user_id'] = user_id_S[0]['userID']
 
         print(response_data)
         return jsonify(response_data)
