@@ -1,6 +1,7 @@
 var loginDialog = document.getElementById('loginForm');
 
 let isLoggedIn = false;
+let sessionId = -1;
 
 window.onclick = function(event) {
     if (event.target === loginDialog) {
@@ -45,6 +46,8 @@ function login() {
         if (data.success) {
             isLoggedIn = true;
             toggleForms();
+            changeTheme(data.backgroundColor);
+            sessionId = data.sesja;
         }
     })
         .catch(error => console.error('Error:', error));
@@ -86,6 +89,7 @@ function register() {
 
 function logout() {
     isLoggedIn = false;
+    sessionId = -1;
     toggleForms();
 
 }
@@ -110,7 +114,7 @@ function toggleForms() {
 
 
 
-
+/*
 function getWeather() {
 
     fetch('/weather')
@@ -125,7 +129,7 @@ function getWeather() {
             console.error('Error:', error);
         });
 }
-
+*/
 
 
 function updateUI() {
@@ -141,4 +145,49 @@ function changeTheme(selectedTheme) {
     };
 
     document.body.style.backgroundColor = themeColors[selectedTheme];
+    submitBackground(selectedTheme);
+}
+
+function getWeather(miasto) {
+        if (miasto.trim() === "") {
+            alert("Wprowadź nazwę miasta przed sprawdzeniem pogody.");
+            return;
+        }
+
+        fetch('/submitCity', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ city: miasto }),
+        })
+        .then(response => response.json())
+        .then(data => updateWeatherElements(data))
+        .catch(error => console.error('Error:', error));
+}
+
+function updateWeatherElements(data) {
+    document.getElementById('temperature').innerText = `${data.temperatura_C}°C`;
+    document.getElementById('conditions').innerText = data.warunki;
+    document.getElementById('city').innerText = data.miasto;
+    document.getElementById('date').innerText = data.data;
+    document.getElementById('weatherIcon').src = data.ikona;
+}
+
+document.addEventListener("DOMContentLoaded", getWeather('Warsaw'));
+
+
+function submitBackground(background) {
+    fetch('/submitBackground', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({color: background}),
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log(data);
+    })
+    .catch(error => console.error('Error:', error));
 }

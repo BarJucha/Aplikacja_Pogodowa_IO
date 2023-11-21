@@ -37,11 +37,15 @@ def currentWeather(city):
         icon = weather_data['current']['condition']['icon']
         city = weather_data['location']['name']
         data = weather_data['location']['localtime']
-        temperature_F = temperature * 33.8
+
+        data = data[:10]
+        rok, miesiac, dzien = data.split('-')
+        formatted_data = f"{dzien}-{miesiac}-{rok}"
+        temperature_F = int(temperature * 9 / 5 + 32)
         temperature_C = int(temperature)
 
         # Przygotuj dane do przekazania do szablonu HTML
-        response_data = {'temperatura_C':temperature_C, 'temperatura_F':temperature_F, 'warunki':condition, 'ikona':icon, 'miasto':city, 'data':data}
+        response_data = {'temperatura_C':temperature_C, 'temperatura_F':temperature_F, 'warunki':condition, 'ikona':icon, 'miasto':city, 'data':formatted_data}
         return jsonify(response_data)
         #return render_template('main.html', temp = temperature, warunki = condition, miasto = city, data = data, icon = icon)
     else:
@@ -50,7 +54,7 @@ def currentWeather(city):
 @app.route('/submitCity', methods=['POST','GET'])
 def submitWeather():
     if request.method=='POST':
-        miasto = str(request.form['city'])
+        miasto = str(request.get_json()['city'])
         api_key = 'c71bd51c9e09474a8db153108231911'
 
         # Wysyłanie zapytania do WeatherAPI
@@ -67,12 +71,12 @@ def submitWeather():
             icon = weather_data['current']['condition']['icon']
             city = weather_data['location']['name']
             data = weather_data['location']['localtime']
-            temperature_F = temperature * 33.8
+
             data = data[:10]
             rok, miesiac, dzien = data.split('-')
             formatted_data = f"{dzien}-{miesiac}-{rok}"
 
-            #return render_template('main.html', temp = formatted_temperature, warunki = condition, miasto = city, data = formatted_data, icon = icon)
+            temperature_F = int(temperature * 9 / 5 + 32)
             temperature_C = int(temperature)
 
             # Przygotuj dane do przekazania do szablonu HTML
@@ -142,10 +146,8 @@ def submitBackground():
         backgroundColor = data.get('color')
         query = "UPDATE uzytkownik SET tlo = %s WHERE userID = %s"
         data = (backgroundColor, user_id)
-        cursor = db_connection.cursor()
-        cursor.execute(query, data)
-        db_connection.commit()
-        cursor.close()
+        db_connection.execute_query(query, data)
+
         return jsonify({'success':True, 'color':backgroundColor})
     else:
          return jsonify({'success':False, 'user_id': 'no in session'})

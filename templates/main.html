@@ -12,14 +12,16 @@
 <div class="weatherContainer">
     <div class="cityInfo">
         <div id="searchContainer">
-            <form action="/submitCity" method="post">
-            <input type="text" id="city" name="city" placeholder="Wpisz miasto..." value="">
+            <form id="weatherForm">
+            <input type="text" id="citySearchbar" name="city" placeholder="Wpisz miasto..." value="">
+            <button type="button" onclick="getWeather(document.getElementById('citySearchbar').value)">Sprawdź pogodę</button>
         </form>
         </div>
         <div>
-            <h2 id="cityDateHeader">{{ miasto }}, {{ data }}</h2>
-            <h2 id="temperatureHeader">{{ temp }} (stopni/dodać Fahrenheit)</h2>
-            <img src={{ icon }} alt="Weather Icon"><h2 id="conditionHeader" style="display: inline-block;">{{ warunki }}</h2>
+            <h2 id="city">Miasto</h2>
+            <h2 id="date">Data</h2>
+            <h2 id="temperature">Temperatura</h2>
+            <img src='' alt="Weather Icon" id="weatherIcon"><h2 id="conditions" style="display: inline-block;">Warunki</h2>
         </div>
     </div>
     <div class="middle"></div>
