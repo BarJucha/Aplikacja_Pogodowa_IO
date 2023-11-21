@@ -37,8 +37,12 @@ def currentWeather(city):
         data = weather_data['location']['localtime']
 
         # Przygotuj dane do przekazania do szablonu HTML
+        data = data[:10]
+        rok, miesiac, dzien = data.split('-')
+        formatted_data = f"{dzien}-{miesiac}-{rok}"
+        formatted_temperature = int(temperature)
 
-        return render_template('main.html', temp = temperature, warunki = condition, miasto = city, data = data, icon = icon)
+        return render_template('main.html', temp = formatted_temperature, warunki = condition, miasto = city, data = formatted_data, icon = icon)
     else:
         return redirect(url_for('index'))
 
