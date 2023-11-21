@@ -68,11 +68,16 @@ def submitWeather():
             city = weather_data['location']['name']
             data = weather_data['location']['localtime']
             temperature_F = temperature * 33.8
+            data = data[:10]
+            rok, miesiac, dzien = data.split('-')
+            formatted_data = f"{dzien}-{miesiac}-{rok}"
+
+            #return render_template('main.html', temp = formatted_temperature, warunki = condition, miasto = city, data = formatted_data, icon = icon)
             temperature_C = int(temperature)
 
             # Przygotuj dane do przekazania do szablonu HTML
             response_data = {'succes':True, 'temperatura_C':temperature_C, 'temperatura_F':temperature_F, 'warunki':condition, 
-                             'ikona':icon, 'miasto':city, 'data':data}
+                             'ikona':icon, 'miasto':city, 'data':formatted_data}
             return jsonify(response_data)
             #return render_template('main.html', temp = temperature, warunki = condition, miasto = city, data = data, icon = icon)
         else:
