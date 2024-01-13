@@ -5,6 +5,10 @@ import os
 import login
 import currentWeather
 import requests
+from fRemoveCityToFollow import fRemoveCityToFollow
+from getFavouriteCties import fgetFavouriteCities
+from getFollowedCities import fgetFollowedCities
+from getHourForecast import fgetHourForecast
 
 from login import login_blueprint
 app = Flask(__name__, static_url_path='/static')
@@ -87,6 +91,13 @@ def submitWeather():
         else:
             response_data = {'succes':False}
             return jsonify(response_data)
+        
+@app.route('/getHourForecast', methods=['POST', 'GET'])
+def getHourForecast():
+    if request.method=='POST':
+        miasto = str(request.get_json()['city'])
+        result = fgetHourForecast(miasto)
+        return result
 
 """@app.route('/<int:userID>}')
 def user_id(userID):
@@ -166,12 +177,6 @@ def addCityToFavourite():
             data_add_favorite_city = (user_id, miasto)
             db_connection.execute_query(query_add_favorite_city, data_add_favorite_city)
         
-        query_to_get_cities = "SELECT miasto FROM ulubione_miasta WHERE user_id = %s ORDER BY miasto"
-        cursor, result = db_connection.execute_query(query_to_get_cities, user_id)
-
-        cities_list = [row['miasto'] for row in result]
-
-        return jsonify(cities_list) 
 
 @app.route('/deleteCityFromFavourite', methods=['POST', 'GET'])
 def deleteCityFromFavourite():
@@ -181,14 +186,39 @@ def deleteCityFromFavourite():
         query = "DELETE FROM ulubione_miasta WHERE user_id = %s AND miasto = %s"
         data_to_delete = (user_id, miasto)
         db_connection.execute_query(query, data_to_delete)
-        
-        query_to_get_cities = "SELECT miasto FROM ulubione_miasta WHERE user_id = %s ORDER BY miasto"
-        cursor, result = db_connection.execute_query(query_to_get_cities, user_id)
 
-        cities_list = [row['miasto'] for row in result]
 
-        return jsonify(cities_list)
-    
+@app.route('/getFavouriteCities', methods=['POST', 'GET'])
+def getFavouriteCities():
+    user_id = session['user_id']
+    result = fgetFavouriteCities(db_connection, user_id)
+    return result
+
+  
+@app.route('/addCityToFollow', methods=['POST', 'GET'])
+def addCityToFollow():
+    if request.method == 'POST':
+        miasto = str(request.get_json()['city'])
+        date = str(request.get_json()['date'])
+        user_id = session['user_id']
+
+        query_to_add = "INSERT INTO sledzona_pogoda (miasto, userID, prognozaID) VALUES (%s, %s, %s)"
+        data = (miasto, user_id, )
+        cursor, result = db_connection.execute_query(query_to_add, data)
+
+        cities_data = [{'miasto': row['miasto'], 'data': row['datetime'], 'stan': row['stan'], 'icon': row['icon']} for row in result]
+
+        return jsonify(cities_data)
+
+@app.route('/removeCityToFollow', methods=['POST', 'GET'])
+def removeCityToFollow():
+    if request.method == 'POST':
+        miasto = str(request.get_json()['city'])
+        date = str(request.get_json()['date'])
+        user_id = session['user_id']
+        fRemoveCityToFollow(db_connection, miasto, date, user_id)
+
+
 if __name__ == '__main__':
     app.run(debug=True)
     #db_connection.close_connection()
