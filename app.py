@@ -152,6 +152,29 @@ def submitBackground():
     else:
          return jsonify({'success':False, 'user_id': 'no in session'})
 
+
+@app.route('/submitTemperature', methods=['POST'])
+def submitTemperature():
+    if 'user_id' in session:
+        user_id = session['user_id']
+        data = request.get_json()
+        temperatureValue = data.get('temperature')
+
+        query = "UPDATE uzytkownik SET temp = %s WHERE userID = %s"
+        data = (temperatureValue, user_id)
+        db_connection.execute_query(query, data)
+
+        return jsonify({'success': True, 'temperature': temperatureValue})
+
+    else:
+        return jsonify({'success': False, 'user_id': 'no in session'})
+
+
+
+
+
+
+
 if __name__ == '__main__':
     app.run(debug=True)
     #db_connection.close_connection()

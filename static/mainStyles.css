@@ -6,6 +6,8 @@ body {
     flex-direction: column;
     justify-content: flex-end;
     background-color: rgb(230, 197, 15);
+    overflow-y: auto;
+    overflow-x: auto;
 }
 
 
@@ -193,7 +195,11 @@ input[type=email], input[type=password] {
     opacity: 80%;
 }
 
-/* Styl dla podtytułów */
+.themeSelector {
+    text-align: center;
+}
+
+
 .themeSelector label {
     display: block;
     font-size: 16px;
@@ -201,7 +207,6 @@ input[type=email], input[type=password] {
     margin-bottom: 10px;
 }
 
-/* Styl dla przycisku zamykającego okno */
 .themeSelector .close {
     position: absolute;
     top: 10px;
@@ -210,7 +215,6 @@ input[type=email], input[type=password] {
     cursor: pointer;
 }
 
-/* Styl dla listy wysuwanej */
 .themeSelector select {
     width: 100%;
     padding: 8px;
@@ -221,7 +225,7 @@ input[type=email], input[type=password] {
     box-sizing: border-box;
 }
 
-/* Dodatkowe style dla opcji listy */
+
 .themeSelector option {
     font-size: 14px;
 }
@@ -234,8 +238,12 @@ input[type=email], input[type=password] {
 }
 
 .settingTitle {
-    width: 100%;
-    margin-left: 0;
-    margin-top: 0;
-    background-color: #91A3B0;
+    width: 70%;
+    background-color: #E5E6D6;
+    margin: 0 auto;
+    border-radius: 10px;
+}
+
+#interpolatedPolynomialChart {
+    min-width: 100vw;
 }
