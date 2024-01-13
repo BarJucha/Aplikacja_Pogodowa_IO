@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <title>Weather App</title>
     <link rel="stylesheet" type="text/css" href="/static/mainStyles.css">
-
-
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script type="text/javascript" src="/static/polyFunctions.js"></script>
 </head>
 <body>
 
@@ -40,8 +40,12 @@
 
     </div>
     <div class="middlePanel">
-        <div class="box"></div>
-        <div class="box"></div>
+        <div class="box">
+
+        </div>
+        <div class="box">
+
+        </div>
     </div>
     <div class="futureWeather"></div>
 </div>
@@ -86,11 +90,17 @@
 <div id="id02" class="loginDialog">
     <form class="loginWindow animate" id="settingsForm" style="display:block; height: 40%">
         <div class="themeSelector">
+            <div>
+                <h1 style="font-family: 'Times New Roman',serif; font-size: 20px;">SETTINGS</h1>
+            </div>
+
             <span onclick="document.getElementById('id02').style.display='none'" class="close" title="Close Modal">&times;</span>
             <div class="settingPair">
-                <div class="settingTitle"><h1 class="settingTitle">Ustawienia tła</h1></div>
+                <div class="settingTitle">
+                    <h1 class="settingTitle">Background color</h1>
+                </div>
                 <div class="settingValue">
-                    <label for="themeSelect">Wybierz preferowany kolor tła:</label>
+                    <br>
                     <select id="themeSelect" onchange="changeTheme(this.value)" style="width: 50%">
                         <option value="light">Light</option>
                         <option value="dark">Dark</option>
@@ -100,24 +110,54 @@
                 </div>
             </div>
             <div class="settingPair">
-                <div class="settingTitle"><h1 class="settingTitle">Ustawienia wartości</h1></div>
+                <div class="settingTitle">
+                    <h1 class="settingTitle">Temperature unit</h1>
+                </div>
                 <div class="settingValue">
-                    <p> TBA checkbox jednostka temperatury wyswietlana na stronie </p>
+                    <br>
+                    <select id="tempSelect" onchange="switchWeatherUnit(this.value); submitTemperature(this.value)" style="width: 50%">
+                        <option value="0">Celsius</option>
+                        <option value="1">Fahrenheit</option>
+                    </select>
                 </div>
             </div>
             <div class="settingPair">
-                <div class="settingTitle"><h1 class="settingTitle">Ustawienia powiadomień</h1></div>
+                <div class="settingTitle">
+                    <h1 class="settingTitle">Notifications</h1>
+                </div>
                 <div class="settingValue">
-                    <p> TBA checkbox powiadomien mail </p>
+                    <br>
+                    <input type="checkbox" id="emailNotificationCheckbox"/>
+                    Mail notifications
                 </div>
             </div>
         </div>
     </form>
 </div>
 
-
-
 <script type="text/javascript" src="/static/mainScripts.js"></script>
+
+<canvas id="interpolatedPolynomialChart" style="position: absolute; bottom: 0; left: 0; right: 0; z-index: -1;"></canvas>
+
+
+<script>
+    function getRandomInt(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    function generateRandomPoints(count) {
+        const points = [];
+        for (let i = 0; i < count; i++) {
+            points.push({ x: i + 1, y: getRandomInt(5, 25) });
+        }
+        return points;
+    }
+
+    const randomInterpolationPoints = generateRandomPoints(8);
+
+    // Wywołanie funkcji do rysowania wykresu wielomianowego
+    drawInterpolatedPolynomialChart(randomInterpolationPoints);
+</script>
 
 </body>
 </html>
