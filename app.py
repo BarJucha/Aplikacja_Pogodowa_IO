@@ -152,29 +152,43 @@ def submitBackground():
     else:
          return jsonify({'success':False, 'user_id': 'no in session'})
 
-
-@app.route('/submitTemperature', methods=['POST'])
-def submitTemperature():
-    if 'user_id' in session:
+@app.route('/addCityToFavourite', methods=['POST', 'GET'])
+def addCityToFavourite():
+    if request.method == 'POST':
+        miasto = str(request.get_json()['city'])
         user_id = session['user_id']
-        data = request.get_json()
-        temperatureValue = data.get('temperature')
+        query_check_existing_city = "SELECT * FROM ulubione_miasta WHERE user_id = %s AND miasto = %s"
+        data_check_existing_city = (user_id, miasto)
+        existing_city = db_connection.execute_query(query_check_existing_city, data_check_existing_city)
 
-        query = "UPDATE uzytkownik SET temp = %s WHERE userID = %s"
-        data = (temperatureValue, user_id)
-        db_connection.execute_query(query, data)
+        if not existing_city:
+            query_add_favorite_city = "INSERT INTO ulubione_miasta (user_id, miasto) VALUES (%s, %s)"
+            data_add_favorite_city = (user_id, miasto)
+            db_connection.execute_query(query_add_favorite_city, data_add_favorite_city)
+        
+        query_to_get_cities = "SELECT miasto FROM ulubione_miasta WHERE user_id = %s ORDER BY miasto"
+        cursor, result = db_connection.execute_query(query_to_get_cities, user_id)
 
-        return jsonify({'success': True, 'temperature': temperatureValue})
+        cities_list = [row['miasto'] for row in result]
 
-    else:
-        return jsonify({'success': False, 'user_id': 'no in session'})
+        return jsonify(cities_list) 
 
+@app.route('/deleteCityFromFavourite', methods=['POST', 'GET'])
+def deleteCityFromFavourite():
+    if request.method == 'POST':
+        miasto = str(request.get_json()['city'])
+        user_id = session['user_id']
+        query = "DELETE FROM ulubione_miasta WHERE user_id = %s AND miasto = %s"
+        data_to_delete = (user_id, miasto)
+        db_connection.execute_query(query, data_to_delete)
+        
+        query_to_get_cities = "SELECT miasto FROM ulubione_miasta WHERE user_id = %s ORDER BY miasto"
+        cursor, result = db_connection.execute_query(query_to_get_cities, user_id)
 
+        cities_list = [row['miasto'] for row in result]
 
-
-
-
-
+        return jsonify(cities_list)
+    
 if __name__ == '__main__':
     app.run(debug=True)
     #db_connection.close_connection()
