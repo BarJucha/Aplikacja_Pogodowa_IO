@@ -232,7 +232,7 @@ function submitBackground(background) {
 
 function submitTemperature(tempUnit) {
 
-    const requestData = {temperature: tempUnit};
+    const requestData = {temperature: parseInt(tempUnit)};
 
     fetch('/submitTemperature', {
         method: 'POST',

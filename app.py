@@ -152,6 +152,22 @@ def submitBackground():
     else:
          return jsonify({'success':False, 'user_id': 'no in session'})
 
+
+@app.route('/submitTemperature', methods=['POST'])
+def submitTemperature():
+    if 'user_id' in session:
+        user_id = session['user_id']
+        data = request.get_json()
+        temp = data.get('temperature')
+        query = "UPDATE uzytkownik SET temp = %s WHERE userID = %s"
+        data = (temp, user_id)
+        db_connection.execute_query(query, data)
+
+        return jsonify({'success': True, 'temp': temp})
+    else:
+        return jsonify({'success': False, 'user_id': 'no in session'})
+
+
 @app.route('/addCityToFavourite', methods=['POST', 'GET'])
 def addCityToFavourite():
     if request.method == 'POST':
