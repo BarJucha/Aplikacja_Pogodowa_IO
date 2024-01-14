@@ -3,7 +3,7 @@ from flask import Flask, request, session, redirect, url_for, jsonify, render_te
 import requests
 from getFavouriteCties import fgetFavouriteCities
 from getWeather import fgetHourForecast, fgetDailyForecast, getCurrentWeather
-from followCity import fgetFollowedCities, fRemoveCityToFollow
+from followCity import fgetFollowedCities, fRemoveCityToFollow, faddCityToFollow
 
 from login import login_blueprint
 app = Flask(__name__, static_url_path='/static')
@@ -111,6 +111,7 @@ def getFavouriteCities():
     result = fgetFavouriteCities(db_connection, user_id)
     return jsonify(result)
 
+
 # Endpoint obsługujący dodanie miasta do śledzenia
 @app.route('/addCityToFollow', methods=['POST', 'GET'])
 def addCityToFollow():
@@ -118,15 +119,8 @@ def addCityToFollow():
         miasto = str(request.get_json()['city'])
         date = str(request.get_json()['date'])
         user_id = session['user_id']
-
-        # TODO
-        query_to_add = "INSERT INTO sledzona_pogoda (miasto, userID, prognozaID) VALUES (%s, %s, %s)"
-        data = (miasto, user_id, )
-        cursor, result = db_connection.execute_query(query_to_add, data)
-
-        cities_data = [{'miasto': row['miasto'], 'data': row['datetime'], 'stan': row['stan'], 'icon': row['icon']} for row in result]
-
-        return jsonify(cities_data)
+        faddCityToFollow(db_connection, miasto, date, user_id)
+        
 
 # Endpoint obsługujący usunięcie miasta do śledzenia
 @app.route('/removeCityToFollow', methods=['POST', 'GET'])
@@ -137,6 +131,7 @@ def removeCityToFollow():
         user_id = session['user_id']
         fRemoveCityToFollow(db_connection, miasto, date, user_id)
 
+
 # Endpoint obsługujący pobranie miast do śledzenia zalogowanego użytkownika
 @app.route('/getFollowedCities', methods=['POST', 'GET'])
 def getFollowedCities():
@@ -144,6 +139,7 @@ def getFollowedCities():
         user_id = session['user_id']
         result = fgetFollowedCities(db_connection, user_id)
         return jsonify(result)
+
 
 if __name__ == '__main__':
     app.run(debug=True)
