@@ -40,7 +40,8 @@ def login():
             backgroundColor = user[0]['tlo']
             temp = user[0]['temp']
             session['user_id'] = user[0]['userID']
-            response_data = {'success': True, 'message': 'Zalogowano pomyślnie', 'backgroundColor': backgroundColor, 'unit': temp, 'sesja': session['user_id']}
+            city = user[0]['miasto']
+            response_data = {'success': True, 'message': 'Zalogowano pomyślnie', 'backgroundColor': backgroundColor, 'unit': temp, 'defaultCity': city, 'sesja': session['user_id']}
         else:
             response_data = {'success': False, 'message': 'Użytkownik o podanym email istnieje, ale błędne hasło.'}
     else:

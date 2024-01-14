@@ -22,10 +22,10 @@ def submitWeather():
     if request.method=='POST':
         miasto = str(request.get_json()['city']) # Pobranie miasta
         result = getCurrentWeather(miasto)
-        if result['succes'] == True:
+        if result['success'] == True:
             return jsonify(result)
         else:
-            response_data = {'succes':False}
+            response_data = {'success':False}
             return jsonify(response_data)
 
 # Endpoint obsługujący żądania godzinowej prognozy pogody.
@@ -73,6 +73,35 @@ def submitTemperature():
         db_connection.execute_query(query, data)
 
         return jsonify({'success': True, 'temp': temp})
+    else:
+        return jsonify({'success': False, 'user_id': 'no in session'})
+
+@app.route('/submitDefaultCity', methods=['POST'])
+def submitDefaultCity():
+    if 'user_id' in session:
+        user_id = session['user_id']
+        data = request.get_json()
+        city = data.get('city')
+        query = "UPDATE uzytkownik SET miasto = %s WHERE userID = %s"
+        data = (city, user_id)
+        db_connection.execute_query(query, data)
+
+        return jsonify({'success': True, 'default': city})
+    else:
+        return jsonify({'success': False, 'user_id': 'no in session'})
+
+@app.route('/submitNotification', methods=['POST'])
+def submitNotification():
+    if 'user_id' in session:
+        user_id = session['user_id']
+        data = request.get_json()
+        notification = data.get('notification')
+        query = "UPDATE uzytkownik SET powiadomienia = %s WHERE userID = %s"
+        data = (notification, user_id)
+        db_connection.execute_query(query, data)
+        print(notification);
+
+        return jsonify({'success': True, 'default': notification})
     else:
         return jsonify({'success': False, 'user_id': 'no in session'})
 

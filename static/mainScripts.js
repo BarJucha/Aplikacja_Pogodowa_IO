@@ -47,7 +47,8 @@ function login() {
             toggleForms();
             sessionId = data.sesja;
             changeTheme(data.backgroundColor);
-            switchWeatherUnit(data.unit);
+            //switchWeatherUnit(data.unit);
+            getWeather(data.defaultCity);
         }
         else {
             alert(data.message);
@@ -100,20 +101,24 @@ function logout() {
 
     temperatureUnit = 0;
     console.log(temperatureUnit);
-    switchWeatherUnit("0");
+    //switchWeatherUnit("0");
+    getWeather(document.getElementById('city').innerText);
 
 }
 
 
 function toggleForms() {
     let loginForm = document.getElementById('loginForm');
+    let defaultButton = document.getElementById('defaultButton')
     let logoutForm = document.getElementById('logoutForm');
 
     if (isLoggedIn) {
+        defaultButton.style.display = 'block';
         loginForm.style.display = 'none';
         document.getElementById('settings').style.display = 'block';
         logoutForm.style.display = 'block';
     } else {
+        defaultButton.style.display = 'none';
         loginForm.style.display = 'block';
         document.getElementById('settings').style.display = 'none';
         logoutForm.style.display = 'none';
@@ -160,6 +165,8 @@ function getWeather(miasto) {
             alert("Wprowadź nazwę miasta przed sprawdzeniem pogody.");
             return;
         }
+        getHourForecast(miasto);
+        getDailyForecast(miasto);
 
         fetch('/submitCity', {
             method: 'POST',
@@ -171,6 +178,7 @@ function getWeather(miasto) {
         .then(response => response.json())
         .then(data => updateWeatherElements(data))
         .catch(error => console.error('Error:', error));
+
 }
 
 function updateWeatherElements(data) {
@@ -188,14 +196,11 @@ function updateWeatherElements(data) {
         element.style.transform = 'translateY(80px)';
     });
 
-    if (temperatureUnit === 0){
+    if (temperatureUnit === 0)
         elements.temperatureElement.innerText = `${data.temperatura_C} °C`;
-        console.log(temperatureUnit);
-    }
-    else {
-        elements.temperatureElement.innerText = `${Math.round((data.temperatura_C - 32)*5/9)} °F`;
-        console.log(temperatureUnit);
-    }
+    else
+        elements.temperatureElement.innerText = `${Math.round((9/5*data.temperatura_C - 32))} °F`;
+
 
     elements.conditionsElement.innerText = data.warunki;
     elements.cityElement.innerText = data.miasto;
@@ -229,9 +234,25 @@ function submitBackground(background) {
     .catch(error => console.error('Error:', error));
 }
 
+function submitNotification(value) {
+    fetch('/submitNotification', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({notification: value}),
+    })
+        .then(response => response.json())
+        .then(data => {
+            console.log(data);
+        })
+        .catch(error => console.error('Error:', error));
+}
+
 
 function submitTemperature(tempUnit) {
 
+    temperatureUnit = parseInt(tempUnit);
     const requestData = {temperature: parseInt(tempUnit)};
 
     fetch('/submitTemperature', {
@@ -253,6 +274,31 @@ function submitTemperature(tempUnit) {
             console.error('Błąd:', error);
         });
 }
+
+function submitDefaultCity() {
+    const requestData =  {city: document.getElementById('city').innerText};
+
+    fetch('/submitDefaultCity', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestData),
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                console.log('Udało się!');
+            } else {
+                console.error('Błąd!', data);
+            }
+        })
+        .catch(error => {
+            console.error('Błąd:', error);
+        });
+}
+
+
 
 function switchWeatherUnit(tempUnit, temperatureElement = document.getElementById('temperature')) {
     const lastChar = temperatureElement.innerText.slice(-1);
@@ -282,3 +328,167 @@ function switchWeatherUnit(tempUnit, temperatureElement = document.getElementByI
 
 
 
+function getHourForecast(miasto) {
+
+    fetch('/getHourForecast', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ city: miasto }),
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data) {
+                if (temperatureUnit === 1) {
+                    data.forEach(item => {
+                        item.temp = (9 / 5) * item.temp + 32;
+                    });
+                }
+                console.log(data);
+                const interpolationPoints = data.map((data, index) => ({
+                    x: index * 3,
+                    y: data.temp,
+                    z: data.time.slice(-5),
+                }));
+                console.log(interpolationPoints);
+                drawInterpolatedPolynomialChart("interpolatedPolynomialChartSmall",interpolationPoints, "small");
+            } else {
+                console.error('Błąd!', data);
+            }
+        })
+        .catch(error => {
+            console.error('Błąd:', error);
+        });
+}
+
+function getDailyForecast(miasto) {
+
+    fetch('/getDailyForecast', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ city: miasto }),
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data) {
+                if (temperatureUnit === 1) {
+                    data.forEach(item => {
+                        item.max_temp = Math.round((9 / 5) * item.max_temp + 32);
+                        item.min_temp = Math.round((9 / 5) * item.min_temp + 32);
+                    });
+                }
+                renderCalendar(data);
+                console.log(data);
+            } else {
+                console.error('Błąd!', data);
+            }
+        })
+        .catch(error => {
+            console.error('Błąd:', error);
+        });
+}
+
+
+
+function renderCalendar(forecastData) {
+    const calendarContainer = document.getElementById('dailyForecast');
+    const calendar = document.getElementById('calendar');
+
+    // Usuń istniejące elementy kalendarza
+    while (calendar.firstChild) {
+        calendar.removeChild(calendar.firstChild);
+    }
+
+    forecastData.forEach(day => {
+        const dayElement = document.createElement('div');
+        dayElement.classList.add('day');
+        if (temperatureUnit === 1)
+            dayElement.innerHTML = `
+                <h3>${day.date}</h3>
+                <p>Sunrise: ${day.sunrise}</p>
+                <p>Sunset: ${day.sunset}</p>
+                <p>Max Temp: ${day.max_temp}°F</p>
+                <p>Min Temp: ${day.min_temp}°F</p>
+                <p>Max Wind: ${day.max_wind} kph</p>
+                <p>Average Humidity: ${day.avghumidity}%</p>
+                <p>Condition: ${day.condition}</p>
+                <img src="${day.icon}" alt="${day.condition}">
+                <p>UV index: ${day.uv}</p>
+            `;
+        else
+            dayElement.innerHTML = `
+                <h3>${day.date}</h3>
+                <p>Sunrise: ${day.sunrise}</p>
+                <p>Sunset: ${day.sunset}</p>
+                <p>Max Temp: ${day.max_temp}°C</p>
+                <p>Min Temp: ${day.min_temp}°C</p>
+                <p>Max Wind: ${day.max_wind} kph</p>
+                <p>Average Humidity: ${day.avghumidity}%</p>
+                <p>Condition: ${day.condition}</p>
+                <img src="${day.icon}" alt="${day.condition}">
+                <p>UV index: ${day.uv}</p>
+            `;
+
+        calendar.appendChild(dayElement);
+    });
+
+    const days = document.querySelectorAll('.day');
+    const prevButton = document.getElementById('prev-btn');
+    const nextButton = document.getElementById('next-btn');
+
+    let currentIndex = 0;
+
+    const updateVisibility = () => {
+        days.forEach((day, index) => {
+            day.style.opacity = index === currentIndex ? 1 : 0;
+        });
+    };
+
+    const scrollCalendar = (direction) => {
+        const dayWidth = days[0].offsetWidth + 10;
+        const maxIndex = forecastData.length - 1;
+
+        currentIndex = Math.max(0, Math.min(currentIndex + direction, maxIndex));
+
+        const transformValue = -currentIndex * dayWidth + 'px';
+        calendar.style.transform = `translateX(${transformValue})`;
+
+        prevButton.style.display = currentIndex === 0 ? 'none' : 'block';
+        nextButton.style.display = currentIndex === maxIndex ? 'none' : 'block';
+
+        updateVisibility();
+    };
+
+    prevButton.onclick = () => scrollCalendar(-1);
+    nextButton.onclick = () => scrollCalendar(1);
+
+    prevButton.style.display = 'none';
+    nextButton.style.display = forecastData.length > 1 ? 'block' : 'none';
+
+    scrollCalendar(1);
+    scrollCalendar(-1);
+    updateVisibility();
+}
+
+function updateClock() {
+    var now = new Date();
+    var hours = now.getHours();
+    var minutes = now.getMinutes();
+    var seconds = now.getSeconds();
+
+    // Formatowanie czasu do postaci hh:mm:ss
+    var formattedTime = padZero(hours) + ":" + padZero(minutes) + ":" + padZero(seconds);
+
+    // Wyświetlanie sformatowanego czasu w elemencie div
+    document.getElementById('clock').innerText = formattedTime;
+}
+
+function padZero(number) {
+    return number < 10 ? "0" + number : number;
+}
+
+setInterval(updateClock, 1000);
+updateClock();

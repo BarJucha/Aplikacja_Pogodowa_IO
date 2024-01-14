@@ -4,27 +4,32 @@
     <meta charset="UTF-8">
     <title>Weather App</title>
     <link rel="stylesheet" type="text/css" href="/static/mainStyles.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://d3js.org/d3.v6.min.js"></script>
     <script type="text/javascript" src="/static/polyFunctions.js"></script>
+    <script type="text/javascript" src="/static/mainScripts.js"></script>
 </head>
 <body>
+
 
 <div class="weatherContainer">
     <div class="cityInfo">
         <div id="searchContainer">
             <form id="weatherForm">
             <input type="text" id="citySearchbar" name="city" placeholder="Wpisz miasto..." value="">
-            <button type="button" onclick="getWeather(document.getElementById('citySearchbar').value)">Sprawdź pogodę</button>
+            <button type="button" onclick="getWeather(document.getElementById('citySearchbar').value); getHourForecast(document.getElementById('city').innerText)">Check the Weather!</button>
         </form>
         </div>
         <div>
             <h2 id="city">Miasto</h2>
+            <button onclick="submitDefaultCity()" id="defaultButton" style="display: none">Set to your default city!</button>
             <h2 id="date">Data</h2>
             <h2 id="temperature">Temperatura</h2>
             <img src='' alt="Weather Icon" id="weatherIcon"><h2 id="conditions" style="display: inline-block;">Warunki</h2>
         </div>
     </div>
-    <div class="middle"></div>
+    <div id="clockContainer">
+<!--        <div id="clock"></div>-->
+    </div>
 
 </div>
 
@@ -44,10 +49,14 @@
 
         </div>
         <div class="box">
-
+            <svg id="interpolatedPolynomialChartSmall"></svg>
         </div>
     </div>
-    <div class="futureWeather"></div>
+    <div class="futureWeather" id="calendar-container">
+        <div id="calendar"></div>
+        <div id="prev-btn" onclick="scrollCalendar(-1)">‹-</div>
+        <div id="next-btn" onclick="scrollCalendar(1)">-›</div>
+    </div>
 </div>
 
 <div id="id01" class="loginDialog">
@@ -102,6 +111,7 @@
                 <div class="settingValue">
                     <br>
                     <select id="themeSelect" onchange="changeTheme(this.value)" style="width: 50%">
+                        <option value="" disabled selected>Select!</option>
                         <option value="light">Light</option>
                         <option value="dark">Dark</option>
                         <option value="sky">Sky</option>
@@ -115,7 +125,8 @@
                 </div>
                 <div class="settingValue">
                     <br>
-                    <select id="tempSelect" onchange="switchWeatherUnit(this.value); submitTemperature(this.value)" style="width: 50%">
+                    <select id="tempSelect" onchange="submitTemperature(this.value); getWeather(document.getElementById('city').innerText)" style="width: 50%">
+                        <option value="" disabled selected>Select!</option>
                         <option value="0">Celsius</option>
                         <option value="1">Fahrenheit</option>
                     </select>
@@ -127,7 +138,7 @@
                 </div>
                 <div class="settingValue">
                     <br>
-                    <input type="checkbox" id="emailNotificationCheckbox"/>
+                    <input type="checkbox" id="emailNotificationCheckbox" onchange="submitNotification(this.checked)"/>
                     Mail notifications
                 </div>
             </div>
@@ -135,12 +146,10 @@
     </form>
 </div>
 
-<script type="text/javascript" src="/static/mainScripts.js"></script>
-
-<canvas id="interpolatedPolynomialChart" style="position: absolute; bottom: 0; left: 0; right: 0; z-index: -1;"></canvas>
-
+<svg id="interpolatedPolynomialChart" style="min-width: 100vw; position:absolute; min-height: 80vh;"></svg>
 
 <script>
+
     function getRandomInt(min, max) {
         return Math.floor(Math.random() * (max - min + 1)) + min;
     }
@@ -155,8 +164,7 @@
 
     const randomInterpolationPoints = generateRandomPoints(8);
 
-    // Wywołanie funkcji do rysowania wykresu wielomianowego
-    drawInterpolatedPolynomialChart(randomInterpolationPoints);
+    drawInterpolatedPolynomialChart("interpolatedPolynomialChart", randomInterpolationPoints);
 </script>
 
 </body>
