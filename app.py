@@ -4,7 +4,7 @@ import requests
 from getFavouriteCties import fgetFavouriteCities
 from getWeather import fgetHourForecast, fgetDailyForecast, getCurrentWeather
 from followCity import fgetFollowedCities, fRemoveCityToFollow, faddCityToFollow
-
+from sendEmail import send_email, getUserEmail
 from login import login_blueprint
 app = Flask(__name__, static_url_path='/static')
 
@@ -76,6 +76,24 @@ def submitTemperature():
     else:
         return jsonify({'success': False, 'user_id': 'no in session'})
 
+# Endpoint obsługujący zmianę ustawień powiadomień
+@app.route('/submitNotification', methods=['POST'])
+def submitNotification():
+    if 'user_id' in session:
+        user_id = session['user_id']
+        data = request.get_json()
+        notification = data.get('notification')
+        query = "UPDATE uzytkownik SET powiadomienia = %s WHERE userID = %s"
+        data = (notification, user_id)
+        db_connection.execute_query(query, data)
+
+        if notification == 1:
+            user_email = getUserEmail(db_connection, user_id)
+            send_email("Zmiana ustawień powiadomień", "Włączyłeś powiadomienia", user_email)
+
+        return jsonify({'success': True, 'notification': notification})
+    else:
+        return jsonify({'success': False, 'user_id': 'no in session'})
 
 # Endpoint obsługujący dodanie ulubionego miasta użytkownika do bazy danych
 @app.route('/addCityToFavourite', methods=['POST', 'GET'])
