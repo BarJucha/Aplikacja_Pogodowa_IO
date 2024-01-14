@@ -71,7 +71,7 @@ def fgetDailyForecast(miasto):
         result_data = {'succes': False}
         return result_data
     
-#Funkcja zwraca funkcje
+#Funkcja zwraca obecną pogodę dla miasta
 def getCurrentWeather(miasto):
     api_key = 'c71bd51c9e09474a8db153108231911'
 
