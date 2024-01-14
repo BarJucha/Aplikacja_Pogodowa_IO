@@ -1,14 +1,9 @@
 import dataBase
 from flask import Flask, request, session, redirect, url_for, jsonify, render_template
-import hashlib
-import os
-import login
-import currentWeather
 import requests
-from fRemoveCityToFollow import fRemoveCityToFollow
 from getFavouriteCties import fgetFavouriteCities
-from getFollowedCities import fgetFollowedCities
-from getHourForecast import fgetHourForecast
+from getWeather import fgetHourForecast, fgetDailyForecast, getCurrentWeather
+from followCity import fgetFollowedCities, fRemoveCityToFollow
 
 from login import login_blueprint
 app = Flask(__name__, static_url_path='/static')
@@ -21,134 +16,36 @@ app.register_blueprint(login_blueprint)
 def index():
     return render_template('main.html')
 
-
-@app.route('/currentWeather/<string:city>')
-def currentWeather(city):
-    # Klucz API dostarczony przez WeatherAPI
-    api_key = 'c71bd51c9e09474a8db153108231911'
-
-    # Wysyłanie zapytania do WeatherAPI
-    weather_api_url = f'http://api.weatherapi.com/v1/current.json?key={api_key}&q={city}&aqi=no'
-    response = requests.get(weather_api_url)
-
-    # Sprawdź, czy zapytanie było udane
-    if response.status_code == 200:
-        weather_data = response.json()
-
-        # Przetwórz dane pogodowe
-        temperature = weather_data['current']['temp_c']
-        condition = weather_data['current']['condition']['text']
-        icon = weather_data['current']['condition']['icon']
-        city = weather_data['location']['name']
-        data = weather_data['location']['localtime']
-
-        data = data[:10]
-        rok, miesiac, dzien = data.split('-')
-        formatted_data = f"{dzien}-{miesiac}-{rok}"
-        temperature_F = int(temperature * 9 / 5 + 32)
-        temperature_C = int(temperature)
-
-        # Przygotuj dane do przekazania do szablonu HTML
-        response_data = {'temperatura_C':temperature_C, 'temperatura_F':temperature_F, 'warunki':condition, 'ikona':icon, 'miasto':city, 'data':formatted_data}
-        return jsonify(response_data)
-        #return render_template('main.html', temp = temperature, warunki = condition, miasto = city, data = data, icon = icon)
-    else:
-        return redirect(url_for('index'))
-
+# Endpoint obługujący żadanie pobrania aktualnej pogody dla miasta.
 @app.route('/submitCity', methods=['POST','GET'])
 def submitWeather():
     if request.method=='POST':
-        miasto = str(request.get_json()['city'])
-        api_key = 'c71bd51c9e09474a8db153108231911'
-
-        # Wysyłanie zapytania do WeatherAPI
-        weather_api_url = f'http://api.weatherapi.com/v1/current.json?key={api_key}&q={miasto}&aqi=no'
-        response = requests.get(weather_api_url)
-
-        # Sprawdź, czy zapytanie było udane
-        if response.status_code == 200:
-            weather_data = response.json()
-
-            # Przetwórz dane pogodowe
-            temperature = weather_data['current']['temp_c']
-            condition = weather_data['current']['condition']['text']
-            icon = weather_data['current']['condition']['icon']
-            city = weather_data['location']['name']
-            data = weather_data['location']['localtime']
-
-            data = data[:10]
-            rok, miesiac, dzien = data.split('-')
-            formatted_data = f"{dzien}-{miesiac}-{rok}"
-
-            temperature_F = int(temperature * 9 / 5 + 32)
-            temperature_C = int(temperature)
-
-            # Przygotuj dane do przekazania do szablonu HTML
-            response_data = {'succes':True, 'temperatura_C':temperature_C, 'temperatura_F':temperature_F, 'warunki':condition, 
-                             'ikona':icon, 'miasto':city, 'data':formatted_data}
-            return jsonify(response_data)
-            #return render_template('main.html', temp = temperature, warunki = condition, miasto = city, data = data, icon = icon)
+        miasto = str(request.get_json()['city']) # Pobranie miasta
+        result = getCurrentWeather(miasto)
+        if result['succes'] == True:
+            return jsonify(result)
         else:
             response_data = {'succes':False}
             return jsonify(response_data)
-        
+
+# Endpoint obsługujący żądania godzinowej prognozy pogody.
 @app.route('/getHourForecast', methods=['POST', 'GET'])
 def getHourForecast():
     if request.method=='POST':
-        miasto = str(request.get_json()['city'])
-        result = fgetHourForecast(miasto)
+        miasto = str(request.get_json()['city']) 
+        result = fgetHourForecast(miasto) # Wywołanie funkcji obsługującej prognozę godzinową
         return result
 
-"""@app.route('/<int:userID>}')
-def user_id(userID):
-    session['user'] = userID
-    query = "SELECT * FROM uzytkownik WHERE userID = %d"
-    data = (userID,)
-    cursor, user = db_connection.execute_query(query, data)
-    background = user[0]['tlo']
-    themeColors = {
-    'light': '#ffffff',
-    'dark': '#333333',
-    'sky': '#87CEEB',
-    'nature': '#228B22'
-    }
-    colorBackground = themeColors[background]
-    api_key = 'c71bd51c9e09474a8db153108231911'
-
-    city = 'Cracow'
-    # Wysyłanie zapytania do WeatherAPI
-    weather_api_url = f'http://api.weatherapi.com/v1/current.json?key={api_key}&q={city}&aqi=no'
-    response = requests.get(weather_api_url)
-
-    # Sprawdź, czy zapytanie było udane
-    if response.status_code == 200:
-        weather_data = response.json()
-
-        # Przetwórz dane pogodowe
-        temperature = weather_data['current']['temp_c']
-        condition = weather_data['current']['condition']['text']
-        icon = weather_data['current']['condition']['icon']
-        city = weather_data['location']['name']
-        data = weather_data['location']['localtime']
-
-        # Przygotuj dane do przekazania do szablonu HTML
-
-    return render_template('userMain.html', temp = temperature, warunki = condition, miasto = city, data = data, icon = icon, user=user[0]['email'],
-                           colorBackground=colorBackground)
-
-@app.route('/update_background_color', methods=['POST'])
-def update_background_color():
+# Endpoint obsługujący żądania dziennej prognozy pogody.
+@app.route('/getDailyForecast', methods=['POST', 'GET'])
+def getDailyForecast():
     if request.method == 'POST':
-        user_id = session.get('user')  # Pobierz ID zalogowanego użytkownika
-        background_color = request.form['color']
+        miasto = str(request.get_json()['city'])
+        result = fgetDailyForecast(miasto)  # Wywołanie funkcji obsługującej prognozę dzienną
+        return result
 
-        # Aktualizuj kolor tła w bazie danych
-        query = "UPDATE uzytkownik SET tlo = %s WHERE userID = %s"
-        data = (background_color, user_id)
-        db_connection.execute_query(query, data)
 
-        return jsonify({'success': True})
-"""
+# Endpoint obsługujący zapis ustawień tła dla użytkownika
 @app.route('/submitBackground', methods=['POST'])
 def submitBackground():
     if 'user_id' in session:
@@ -164,6 +61,7 @@ def submitBackground():
          return jsonify({'success':False, 'user_id': 'no in session'})
 
 
+# Endpoint obsługujący zmiane opcji wyświetlania temperatury dla użytkownika
 @app.route('/submitTemperature', methods=['POST'])
 def submitTemperature():
     if 'user_id' in session:
@@ -179,6 +77,7 @@ def submitTemperature():
         return jsonify({'success': False, 'user_id': 'no in session'})
 
 
+# Endpoint obsługujący dodanie ulubionego miasta użytkownika do bazy danych
 @app.route('/addCityToFavourite', methods=['POST', 'GET'])
 def addCityToFavourite():
     if request.method == 'POST':
@@ -194,6 +93,7 @@ def addCityToFavourite():
             db_connection.execute_query(query_add_favorite_city, data_add_favorite_city)
         
 
+# Endpoint obsługujący usunięcie ulubionego miasta użytkownika z bazy danych
 @app.route('/deleteCityFromFavourite', methods=['POST', 'GET'])
 def deleteCityFromFavourite():
     if request.method == 'POST':
@@ -204,13 +104,14 @@ def deleteCityFromFavourite():
         db_connection.execute_query(query, data_to_delete)
 
 
+# Endpoint obsługujący pobranie ulubionych miast zalogowanego użytkownika
 @app.route('/getFavouriteCities', methods=['POST', 'GET'])
 def getFavouriteCities():
     user_id = session['user_id']
     result = fgetFavouriteCities(db_connection, user_id)
     return result
 
-  
+# Endpoint obsługujący dodanie miasta do śledzenia
 @app.route('/addCityToFollow', methods=['POST', 'GET'])
 def addCityToFollow():
     if request.method == 'POST':
@@ -218,6 +119,7 @@ def addCityToFollow():
         date = str(request.get_json()['date'])
         user_id = session['user_id']
 
+        # TODO
         query_to_add = "INSERT INTO sledzona_pogoda (miasto, userID, prognozaID) VALUES (%s, %s, %s)"
         data = (miasto, user_id, )
         cursor, result = db_connection.execute_query(query_to_add, data)
@@ -226,6 +128,7 @@ def addCityToFollow():
 
         return jsonify(cities_data)
 
+# Endpoint obsługujący usunięcie miasta do śledzenia
 @app.route('/removeCityToFollow', methods=['POST', 'GET'])
 def removeCityToFollow():
     if request.method == 'POST':
@@ -234,7 +137,13 @@ def removeCityToFollow():
         user_id = session['user_id']
         fRemoveCityToFollow(db_connection, miasto, date, user_id)
 
+# Endpoint obsługujący pobranie miast do śledzenia zalogowanego użytkownika
+@app.route('/getFollowedCities', methods=['POST', 'GET'])
+def getFollowedCities():
+    if request.method == 'POST':
+        user_id = session['user_id']
+        result = fgetFollowedCities(db_connection, user_id)
+        return result
 
 if __name__ == '__main__':
     app.run(debug=True)
-    #db_connection.close_connection()

@@ -2,7 +2,7 @@ from dataBase import DataBaseConnection
 from flask import Flask, request, session, redirect, url_for, jsonify, render_template
 import requests
 
-
+# Funkcja pobierająca ulubione miasta, wraz z ich obecną pogodą
 def fgetFavouriteCities(db_connection, user_id):
     query = "SELECT miasto FROM ulubione_miasta WHERE userID = %s"
     cursor, result = db_connection.execute_query(query, user_id)

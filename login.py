@@ -10,15 +10,16 @@ app.secret_key = 'klucz_sesji'
 
 db_connection = dataBase.DataBaseConnection()
 
+#Funkcja generująca sól
 def generate_salt():
     return os.urandom(16).hex()
 
-
+# Funkcja generująca zhashowane hasło
 def hash_password(password, salt):
     hashed_password = hashlib.sha256((password + salt).encode('utf-8')).hexdigest()
     return hashed_password
 
-
+# Endpoint obsługujący logowanie użytkownika
 @login_blueprint.route('/login', methods=['POST'])
 def login():
     data = request.get_json()
@@ -48,14 +49,14 @@ def login():
     print(response_data)
     return jsonify(response_data)
 
-
+# Endpoint obsługujący wylogowanie użytkownika
 @login_blueprint.route('/logout')
 def logout():
     # Wyloguj użytkownika i wyczyść sesję
     session.clear()
     return redirect(url_for('/'))
 
-
+# Endpoint obsługujący rejestracje użytkownika
 @login_blueprint.route('/register', methods=['POST'])
 def register():
     try:

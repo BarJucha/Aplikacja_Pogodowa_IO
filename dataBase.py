@@ -1,5 +1,6 @@
 import mysql.connector
 
+# Klasa pomagająca połączyć się z bazą danych
 class DataBaseConnection:
     def __init__(self):
         self.db_config = {
@@ -13,12 +14,14 @@ class DataBaseConnection:
 
         if self.connection.is_connected():
             print('Połączono z bazą danych')
-
+    
+    # Metoda zamykająca połączenie z bazą danych
     def close_connection(self):
         if 'connection' in locals() and self.connection.is_connected():
             self.connection.close()
             print('Połączenie z bazą danych zamknięte')
 
+    # Metoda wykonująca zapytanie na bazie pytań
     def execute_query(self, query, data=None):
         cursor = self.connection.cursor(dictionary=True)
         try:
