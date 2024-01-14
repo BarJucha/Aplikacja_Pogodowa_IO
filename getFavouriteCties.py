@@ -31,4 +31,4 @@ def fgetFavouriteCities(db_connection, user_id):
                              'ikona':icon, 'miasto':city, 'data':formatted_data}
             result_data.append(response_data)
 
-    return jsonify(result_data)
+    return result_data
