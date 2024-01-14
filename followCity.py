@@ -20,5 +20,5 @@ def fgetFollowedCities(db_connection, user_id):
         city_data = {'miasto':row['miasto'], 'data':row['data'], 'stan':['stan'], 'icona':['icona']}
         result_data.append(city_data)
     
-    return jsonify(result_data)
+    return result_data
 

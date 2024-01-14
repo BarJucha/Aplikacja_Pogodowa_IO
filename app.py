@@ -42,7 +42,7 @@ def getDailyForecast():
     if request.method == 'POST':
         miasto = str(request.get_json()['city'])
         result = fgetDailyForecast(miasto)  # Wywołanie funkcji obsługującej prognozę dzienną
-        return result
+        return jsonify(result)
 
 
 # Endpoint obsługujący zapis ustawień tła dla użytkownika
@@ -109,7 +109,7 @@ def deleteCityFromFavourite():
 def getFavouriteCities():
     user_id = session['user_id']
     result = fgetFavouriteCities(db_connection, user_id)
-    return result
+    return jsonify(result)
 
 # Endpoint obsługujący dodanie miasta do śledzenia
 @app.route('/addCityToFollow', methods=['POST', 'GET'])
@@ -143,7 +143,7 @@ def getFollowedCities():
     if request.method == 'POST':
         user_id = session['user_id']
         result = fgetFollowedCities(db_connection, user_id)
-        return result
+        return jsonify(result)
 
 if __name__ == '__main__':
     app.run(debug=True)

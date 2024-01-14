@@ -31,7 +31,10 @@ def fgetHourForecast(miasto):
             if j==24:
                 j = 0
                 i += 1
-        return jsonify(result_data)
+        return result_data
+    else:
+        result_data = {'succes': False}
+        return result_data
     
 #Funkcja zwraca prognozę pogody na następne 9 dni dla podanego miasta
 def fgetDailyForecast(miasto):
@@ -63,7 +66,10 @@ def fgetDailyForecast(miasto):
                 'sunrise': sunrise,
                 'sunset': sunset
             })
-        return jsonify(result_data)
+        return result_data
+    else:
+        result_data = {'succes': False}
+        return result_data
     
 #Funkcja zwraca funkcje
 def getCurrentWeather(miasto):
@@ -93,4 +99,7 @@ def getCurrentWeather(miasto):
         #Przygotowanie danych do wysłania do HTML
         response_data = {'succes':True, 'temperatura_C':temperature_C, 'temperatura_F':temperature_F, 'warunki':condition, 
                          'ikona':icon, 'miasto':city, 'data':formatted_data}
-        return jsonify(response_data)
+        return response_data
+    else:
+        response_data = {'succes': False}
+        return response_data
