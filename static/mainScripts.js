@@ -11,6 +11,8 @@ window.onclick = function(event) {
 }
 
 
+// Logowanie, wylogowanie, rejestracja
+
 function login() {
     const emailInput = document.getElementById('email');
     const passwordInput = document.getElementById('password');
@@ -102,6 +104,8 @@ function logout() {
 }
 
 
+// Zmiana widoku/wyglądu strony
+
 function toggleForms() {
     let loginForm = document.getElementById('loginForm');
     let defaultButton = document.getElementById('defaultButton')
@@ -156,30 +160,6 @@ function changeTheme(selectedTheme) {
     }, 500);
 }
 
-function getWeather(miasto) {
-        if (miasto.trim() === "") {
-            alert("Wprowadź nazwę miasta przed sprawdzeniem pogody.");
-            return;
-        }
-
-
-        fetch('/submitCity', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ city: miasto }),
-        })
-        .then(response => response.json())
-        .then(data => updateWeatherElements(data))
-        .catch(error => console.error('Error:', error));
-
-
-    animatedForecastChange(miasto, 'overlay_cal');
-    animatedForecastChange(miasto, 'overlay_box');
-
-}
-
 function updateWeatherElements(data) {
     const elements = {
         temperatureElement: document.getElementById('temperature'),
@@ -214,133 +194,36 @@ function updateWeatherElements(data) {
     }, 100);
 }
 
+//Pobieranie danych pogodowych
 
-document.addEventListener("DOMContentLoaded", function() {
-    getWeather('Warsaw');
-});
-
-/*
-let resizeTimeout;
-window.addEventListener('resize', function() {
-    const miasto = document.getElementById('city').innerText;
-
-    if (resizeTimeout) {
-        clearTimeout(resizeTimeout);
-    }
-
-    resizeTimeout = setTimeout(function() {
-        animatedForecastChange(miasto, 'overlay_box');
-    }, 500);
-});
-*/
-
-function submitBackground(background) {
-    fetch('/submitBackground', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({color: background}),
-    })
-    .then(response => response.json())
-    .then(data => {
-        console.log("SubmitBackground udany!");
-    })
-    .catch(error => console.error('Error:', error));
-}
-
-function submitNotification(value) {
-    fetch('/submitNotification', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({notification: value}),
-    })
-        .then(response => response.json())
-        .then(data => {
-            console.log("SubmitNotification udane!");
-        })
-        .catch(error => console.error('Error:', error));
-}
-
-
-function submitTemperature(tempUnit) {
-
-    temperatureUnit = parseInt(tempUnit);
-    const requestData = {temperature: parseInt(tempUnit)};
-
-    fetch('/submitTemperature', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(requestData),
-    })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                console.log('submitTemperature udane!');
-            } else {
-                console.error('Błąd!', data);
-            }
-        })
-        .catch(error => {
-            console.error('Błąd:', error);
-        });
-}
-
-function submitDefaultCity() {
-    const requestData =  {city: document.getElementById('city').innerText};
-
-    fetch('/submitDefaultCity', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(requestData),
-    })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                console.log('submitDefaultCity udane!');
-            } else {
-                console.error('Błąd!', data);
-            }
-        })
-        .catch(error => {
-            console.error('Błąd:', error);
-        });
-}
-
-
-
-function switchWeatherUnit(tempUnit, temperatureElement = document.getElementById('temperature')) {
-    const lastChar = temperatureElement.innerText.slice(-1);
-
-    if ((tempUnit.toString() === "0" && lastChar === "C") || (tempUnit.toString() === "1" && lastChar === "F")) {
-        return;
-    }
-
-    let cleanTempText = temperatureElement.innerText.replace(/[^\d.-]/g, '');
-    let currentTemp = parseFloat(cleanTempText);
-
-    temperatureElement.style.transition = 'transform 0.5s ease-in-out';
-    temperatureElement.style.transform = 'translateY(80px)';
-
-    setTimeout(() => {
-        if (tempUnit === "0") {
-            let celsiusTemp = Math.round((currentTemp - 32) * 5/9);
-            temperatureElement.innerText = `${celsiusTemp} °C`;
-        } else {
-            let fahrenTemp = Math.round(9/5 * currentTemp + 32);
-            temperatureElement.innerText = `${fahrenTemp} °F`;
+function getWeather(miasto) {
+        if (miasto.trim() === "") {
+            alert("Wprowadź nazwę miasta przed sprawdzeniem pogody.");
+            return;
         }
 
-        temperatureElement.style.transform = 'none';
-    }, 100);
+
+    animatedForecastChange(miasto, 'overlay_cal');
+    animatedForecastChange(miasto, 'overlay_box');
+
+        fetch('/submitCity', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ city: miasto }),
+        })
+        .then(response => response.json())
+        .then(data => updateWeatherElements(data))
+        .catch(error => console.error('Error:', error));
+
 }
 
+// i przy okazji ustawienie Warszawy i rysowanie tła przy załadowaniu strony
+document.addEventListener("DOMContentLoaded", function() {
+    getWeather('Warsaw');
+    backgroundDrawInterpolatedPolynomialChart(generateRandomPoints(8));
+});
 
 
 function getHourForecast(miasto) {
@@ -404,6 +287,88 @@ function getDailyForecast(miasto) {
 }
 
 
+// Zmiana danych użytkownika w bazie danych
+
+function submitBackground(background) {
+    fetch('/submitBackground', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({color: background}),
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log("SubmitBackground udany!");
+    })
+    .catch(error => console.error('Error:', error));
+}
+
+function submitNotification(value) {
+    fetch('/submitNotification', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({notification: value}),
+    })
+        .then(response => response.json())
+        .then(data => {
+            console.log("SubmitNotification udane!");
+        })
+        .catch(error => console.error('Error:', error));
+}
+
+function submitTemperature(tempUnit) {
+
+    temperatureUnit = parseInt(tempUnit);
+    const requestData = {temperature: parseInt(tempUnit)};
+
+    fetch('/submitTemperature', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestData),
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                console.log('submitTemperature udane!');
+            } else {
+                console.error('Błąd!', data);
+            }
+        })
+        .catch(error => {
+            console.error('Błąd:', error);
+        });
+}
+
+function submitDefaultCity() {
+    const requestData =  {city: document.getElementById('city').innerText};
+
+    fetch('/submitDefaultCity', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestData),
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                console.log('submitDefaultCity udane!');
+            } else {
+                console.error('Błąd!', data);
+            }
+        })
+        .catch(error => {
+            console.error('Błąd:', error);
+        });
+}
+
+
+// Interaktywny kalendarz z pogodą i dokładnymi jej danymi na przyszłe dni
 
 function renderCalendar(forecastData) {
     const calendarContainer = document.getElementById('calendar-container');
@@ -473,6 +438,8 @@ function renderCalendar(forecastData) {
     };
 }
 
+// Prosta obsługa zegara na stronie
+
 function updateClock() {
     let now = new Date();
     let hours = now.getHours();
@@ -489,6 +456,9 @@ function padZero(number) {
 
 setInterval(updateClock, 1000);
 
+
+
+// Animacja przykrywająca zmianę danych pogodowych
 
 function animatedForecastChange(miasto, overlayId) {
     let overlay = document.getElementById(overlayId);

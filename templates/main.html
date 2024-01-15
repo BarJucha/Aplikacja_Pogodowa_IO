@@ -146,31 +146,10 @@
 </div>
 
 <canvas id="interpolatedPolynomialChart" style="min-width: 100vw; position:absolute; min-height: 80vh;"></canvas>
-
+<div class="overlay" id="overlay_dom"></div>
 
 <script type="text/javascript" src="/static/mainScripts.js"></script>
 <script type="text/javascript" src="/static/polyFunctions.js"></script>
-
-<script>
-
-    function getRandomInt(min, max) {
-        return Math.floor(Math.random() * (max - min + 1)) + min;
-    }
-
-    function generateRandomPoints(count) {
-        const points = [];
-        for (let i = 0; i < count; i++) {
-            points.push({ x: i + 1, y: getRandomInt(5, 25) });
-        }
-        return points;
-    }
-
-    const randomInterpolationPoints = generateRandomPoints(8);
-
-    backgroundDrawInterpolatedPolynomialChart(randomInterpolationPoints);
-
-
-</script>
 
 </body>
 </html>
