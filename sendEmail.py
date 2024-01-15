@@ -46,13 +46,8 @@ def read_from_file(plik):
     
 # Funkcja wysyłająca wszystkim użytkownikom z włączonymi powiadomieniami pogodę dla ich defaultCity    
 def send_daily_email(db_connection):
-    smtp_server = 'smtp.gmail.com'
-    smtp_port = 587
-    smtp_username = 'ioweatherapp2024@gmail.com'
-    smtp_password = read_from_file("psw.txt")
     api_key = 'c71bd51c9e09474a8db153108231911'
 
-    from_email = 'ioweatherapp2024@gmail.com'
 
     query = "SELECT * FROM uzytkownik WHERE powiadomienia = 1 AND COALESCE(miasto, '') != ''"
     cursor, result = db_connection.execute_query(query)
@@ -69,20 +64,5 @@ def send_daily_email(db_connection):
             stan = weather_data['forecast']['forecastday'][0]['day']['condition']['text']
             temp = weather_data['forecast']['forecastday'][0]['day']['maxtemp_c']
 
-            # Konstrukcja wiadomości
-            msg = MIMEMultipart()
-            msg['From'] = from_email
-            msg['To'] = to_email
-            msg['Subject'] = "Pogoda na dziś"
-
-            body = f"Pogoda w {miasto} to: {stan} {temp}  "
-            msg.attach(MIMEText(body, 'plain'))
-
-            # Utworzenie połączenia z serwerem SMTP
-            with smtplib.SMTP(smtp_server, smtp_port) as server:
-                server.starttls()
-                server.login(smtp_username, smtp_password)
-
-                # Wysłanie wiadomości
-                server.sendmail(from_email, to_email, msg.as_string())
+            send_email("Pogoda na dziś", f"Pogoda w {miasto} to: {stan} {temp}  ", to_email)
                
