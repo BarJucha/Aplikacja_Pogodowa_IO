@@ -1,3 +1,4 @@
+// Rysowanie funkcji w tle za pomocą interpolacji
 function lagrangeInterpolation(points, x) {
     let result = 0;
 
@@ -16,7 +17,6 @@ function lagrangeInterpolation(points, x) {
     return result;
 }
 
-
 function generateInterpolatedValues(points, numPoints) {
     const interpolatedValues = [];
     const minX = Math.min(...points.map(point => point.x));
@@ -31,6 +31,60 @@ function generateInterpolatedValues(points, numPoints) {
 
     return interpolatedValues;
 }
+
+function backgroundDrawInterpolatedPolynomialChart(points) {
+    const numPoints = 120;
+    const dataPoints = generateInterpolatedValues(points, numPoints);
+
+    var ctx = document.getElementById('interpolatedPolynomialChart').getContext('2d');
+
+
+    const mainStyles = window.getComputedStyle(document.body);
+    const backgroundColor = mainStyles.backgroundColor;
+
+    var chart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: Array.from({ length: numPoints }, (_, i) => i),
+            datasets: [{
+                label: '',
+                borderColor: backgroundColor,
+                data: dataPoints,
+                fill: true,
+                borderWidth: 0,
+                backgroundColor: `rgba(255,255,255, 0.15)`,
+            }]
+        },
+        options: {
+            layout: {
+                padding: 0,
+            },
+            scales: {
+                x: {
+                    display: false,
+                    max: numPoints - 20,
+                    min: 1
+                },
+                y: {
+                    display: false,
+                    min: 5
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false,
+                }
+            },
+            elements: {
+                point: {
+                    radius: 0
+                }
+            }
+        }
+    });
+}
+
+// Rysowanie wykresu danych pogodowych na najbliższe godziny
 
 function drawFunctionFromPoints(points) {
     const svg = d3.select("#hourlyForecast");
@@ -126,57 +180,22 @@ function getTooltipText(d) {
 
 
 
+// Wybór losowych punktów do interpolacji
 
-function backgroundDrawInterpolatedPolynomialChart(points) {
-    const numPoints = 120;
-    const dataPoints = generateInterpolatedValues(points, numPoints);
-
-    var ctx = document.getElementById('interpolatedPolynomialChart').getContext('2d');
-
-
-    const mainStyles = window.getComputedStyle(document.body);
-    const backgroundColor = mainStyles.backgroundColor;
-
-    var chart = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: Array.from({ length: numPoints }, (_, i) => i),
-            datasets: [{
-                label: '',
-                borderColor: backgroundColor,
-                data: dataPoints,
-                fill: true,
-                borderWidth: 0,
-                backgroundColor: `rgba(255,255,255, 0.15)`,
-            }]
-        },
-        options: {
-            layout: {
-                padding: 0,
-            },
-            scales: {
-                x: {
-                    display: false,
-                    max: numPoints - 20,
-                    min: 1
-                },
-                y: {
-                    display: false,
-                    min: 5
-                }
-            },
-            plugins: {
-                legend: {
-                    display: false,
-                }
-            },
-            elements: {
-                point: {
-                    radius: 0
-                }
-            }
-        }
-    });
+function getRandomInt(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
 }
+
+function generateRandomPoints(count) {
+    const points = [];
+    for (let i = 0; i < count; i++) {
+        points.push({ x: i + 1, y: getRandomInt(5, 25) });
+    }
+    return points;
+}
+
+
+
+
 
 
