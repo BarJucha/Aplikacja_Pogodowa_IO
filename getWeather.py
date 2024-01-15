@@ -124,9 +124,9 @@ def fgetForecastInDay(miasto, data):
         stan = " "
         while(True):
             if(weather_data['forecast']['forecastday'][i]['date'] == data):
-                stan = ['forecast']['forecastday'][i]['day']['condition']['text']
-                icon = ['forecast']['forecastday'][i]['day']['condition']['icon']
-                temp = ['forecast']['forecastday'][i]['day']['maxtemp_c']
+                stan = weather_data['forecast']['forecastday'][i]['day']['condition']['text']
+                icon = weather_data['forecast']['forecastday'][i]['day']['condition']['icon']
+                temp = weather_data['forecast']['forecastday'][i]['day']['maxtemp_c']
                 break
             i += 1
         
@@ -134,6 +134,23 @@ def fgetForecastInDay(miasto, data):
         return response_data
             
 
+    else:
+        response_data = {'succes': False}
+        return response_data
+
+# Funkcja zwracająca prognozę pogody na aktualny dzień
+def getTodayForecast(miasto):
+    api_key = 'c71bd51c9e09474a8db153108231911'
+    weather_api_url = f'http://api.weatherapi.com/v1/forecast.json?key={api_key}&q={miasto}&days=10&aqi=no&alerts=no'
+    response = requests.get(weather_api_url)
+
+    if response.status_code == 200:
+        weather_data = response.json()
+        stan = weather_data['forecast']['forecastday'][0]['day']['condition']['text']
+        icon = weather_data['forecast']['forecastday'][0]['day']['condition']['icon']
+        temp = weather_data['forecast']['forecastday'][0]['day']['maxtemp_c']
+        response_data = {'stan':stan, 'icon':icon, 'temp': temp}
+        return response_data
     else:
         response_data = {'succes': False}
         return response_data

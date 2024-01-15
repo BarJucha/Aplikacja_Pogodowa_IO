@@ -4,7 +4,12 @@ import requests
 from getFavouriteCties import fgetFavouriteCities
 from getWeather import fgetHourForecast, fgetDailyForecast, getCurrentWeather
 from followCity import fgetFollowedCities, fRemoveCityToFollow, faddCityToFollow
-from sendEmail import send_email, getUserEmail
+from sendEmail import send_email, send_daily_email
+import time
+from datetime import datetime
+import schedule
+import threading
+from threading import Thread
 from login import login_blueprint
 app = Flask(__name__, static_url_path='/static')
 
@@ -15,6 +20,20 @@ app.register_blueprint(login_blueprint)
 @app.route('/')
 def index():
     return render_template('main.html')
+
+
+# Ustawienie, aby codziennie o 7:00 wysyłać powiadomienia
+schedule.every().day.at("20:39").do(send_daily_email, db_connection)
+
+# Funkcja uruchamiająca harmonogram w osobnym wątku
+def run_schedule():
+    while True:
+        schedule.run_pending()
+        time.sleep(60)
+
+# Uruchomienie wątku dla harmonogramu
+schedule_thread = threading.Thread(target=run_schedule)
+schedule_thread.start()
 
 # Endpoint obługujący żadanie pobrania aktualnej pogody dla miasta.
 @app.route('/submitCity', methods=['POST','GET'])
@@ -177,4 +196,9 @@ def getFollowedCities():
 
 
 if __name__ == '__main__':
+    schedule_thread = Thread(target=run_schedule)
+
+    schedule_thread.start()
+
     app.run(debug=True)
+    schedule_thread.join() 
