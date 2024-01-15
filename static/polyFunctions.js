@@ -32,90 +32,151 @@ function generateInterpolatedValues(points, numPoints) {
     return interpolatedValues;
 }
 
-function drawInterpolatedPolynomialChart(svgId, points, size = "big") {
-    const svg = d3.select(`#${svgId}`);
-    const numPoints = 120;
-    const dataPoints = generateInterpolatedValues(points, numPoints);
+function drawFunctionFromPoints(points) {
+    const svg = d3.select("#hourlyForecast");
 
-    const width = svg.node().clientWidth;
-    const height = svg.node().clientHeight;
-
-    let xMax;
-    let yMin;
-
-    // Usuń poprzedni wykres, etykiety i strzałki
-    svg.selectAll('.line').remove();
-    svg.selectAll('.label').remove();
-    svg.selectAll('.label-background').remove();
-    svg.selectAll('.arrow').remove();
-
-    if (size === "big") {
-        // Ustaw zakres x dla "big"
-        xMax = numPoints - 20;
-        // Ustaw minimalną wartość y na 10 dla "big"
-        yMin = 10;
-    } else if (size === "small") {
-        // Ustaw zakres x dla "small"
-        xMax = points[points.length - 1].x;
-        // Pozostaw domyślne wartości dla "small"
-        yMin = d3.min(dataPoints);
+    if (!svg.node()) {
+        console.error("Element SVG nie został znaleziony");
+        return;
     }
 
-    // Użyj skal x i y, aby dopasować do szerokości i wysokości SVG
+    svg.select("g").remove();
+    svg.select("text").remove();
+
+    const width = svg.node().clientWidth * 0.9;
+    const height = svg.node().clientHeight * 0.9;
+
+    svg.append("text")
+        .attr("x", width / 2)
+        .attr("y", 30)
+        .attr("text-anchor", "middle")
+        .attr("font-size", "20")
+        .text("Godzinowy wykres pogodowy");
+
     const xScale = d3.scaleLinear()
-        .domain([0, xMax])
+        .domain([0, points.length - 1])
         .range([0, width]);
 
     const yScale = d3.scaleLinear()
-        .domain([yMin, d3.max(dataPoints)])
+        .domain([d3.min(points, d => d.y - 5), d3.max(points, d => d.y + 5)])
         .range([height, 0]);
+
+    const g = svg.append("g")
+        .attr("transform", `translate(${width * 0.05},${height * 0.05})`);
 
     const line = d3.line()
         .x((d, i) => xScale(i))
-        .y(d => yScale(d));
+        .y(d => yScale(d.y));
 
-    svg.append('path')
-        .datum(dataPoints)
-        .attr('class', 'line')
-        .attr('d', line)
-        .style('stroke-width', size === "small" ? 2 : 0)
-        .style('stroke', size === "small" ? "black" : "none")
-        .style('fill', size === "big" ? "rgba(255,255,255,0.1)" : "none");
+    g.append("path")
+        .data([points])
+        .attr("fill", "none")
+        .attr("stroke", "black")
+        .attr("stroke-width", 2)
+        .attr("d", line);
 
-    if (size === "small") {
-        const labels = svg.selectAll('.label')
-            .data(points.slice(1, -1)) // Usuń pierwszą i ostatnią etykietę
-            .enter()
-            .append('text')
-            .attr('class', 'label')
-            .attr('x', d => xScale(d.x))
-            .attr('y', d => {
-                const interpolatedY = lagrangeInterpolation(points, d.x);
-                const offset = 100; // Dostosuj offset
-                const yPosition = yScale(interpolatedY) - offset;
-                return yPosition < offset ? offset : yPosition;
-            })
-            .text(d => `${d.z}, ${Math.round(d.y * 10) / 10}`)
-            .style('text-anchor', 'middle')
-            .style('alignment-baseline', 'middle')
-            .style('fill', 'black');
+    let tooltip, foreignObject;
 
-        labels.each(function (d) {
-            const label = d3.select(this);
-            const bbox = label.node().getBBox();
-            svg.insert('rect', ':first-child')
-                .attr('class', 'label-background')
-                .attr('x', bbox.x - 5)
-                .attr('y', bbox.y - 2)
-                .attr('width', bbox.width + 10)
-                .attr('height', bbox.height + 4)
-                .attr('rx', 5)
-                .attr('ry', 5)
-                .style('fill', 'white');
+    const pointsGroup = g.selectAll("circle")
+        .data(points)
+        .enter().append("circle")
+        .attr("class", "data-point")
+        .attr("cx", (d, i) => xScale(i))
+        .attr("cy", d => yScale(d.y))
+        .attr("r", 5)
+        .on("mouseover", function (event, d) {
+
+            tooltip = g.append("rect")
+                .attr("class", "tooltip-bg")
+                .attr("tooltip-bg", "white")
+                .attr("x", xScale(points.indexOf(d)) - 40)
+                .attr("y", yScale(d.y) - 45)
+                .attr("width", 80)
+                .attr("height", 40)
+                .attr("rx", 5)
+                .attr("ry", 5);
+
+            foreignObject = g.append("foreignObject")
+                .attr("x", xScale(points.indexOf(d)) - 40)
+                .attr("y", yScale(d.y) - 45)
+                .attr("width", 120)
+                .attr("height", 60);
+
+            const tooltipDiv = foreignObject.append("xhtml:div")
+                .attr("class", "tooltip-text")
+                .html(getTooltipText(d));
+        })
+
+        .on("mouseout", function () {
+            if (tooltip) tooltip.remove();
+            if (foreignObject) foreignObject.remove();
         });
-    }
-
 }
 
+function getTooltipText(d) {
+    let temperatureText;
+    if (temperatureUnit === 1) {
+        temperatureText = `${d.y}°F`;
+    } else {
+        temperatureText = `${d.y}°C`;
+    }
+
+    return `${temperatureText}<br>time: ${d.z}`;
+}
+
+
+
+
+function backgroundDrawInterpolatedPolynomialChart(points) {
+    const numPoints = 120;
+    const dataPoints = generateInterpolatedValues(points, numPoints);
+
+    var ctx = document.getElementById('interpolatedPolynomialChart').getContext('2d');
+
+
+    const mainStyles = window.getComputedStyle(document.body);
+    const backgroundColor = mainStyles.backgroundColor;
+
+    var chart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: Array.from({ length: numPoints }, (_, i) => i),
+            datasets: [{
+                label: '',
+                borderColor: backgroundColor,
+                data: dataPoints,
+                fill: true,
+                borderWidth: 0,
+                backgroundColor: `rgba(255,255,255, 0.15)`,
+            }]
+        },
+        options: {
+            layout: {
+                padding: 0,
+            },
+            scales: {
+                x: {
+                    display: false,
+                    max: numPoints - 20,
+                    min: 1
+                },
+                y: {
+                    display: false,
+                    min: 5
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false,
+                }
+            },
+            elements: {
+                point: {
+                    radius: 0
+                }
+            }
+        }
+    });
+}
 
 

@@ -6,10 +6,8 @@ body {
     flex-direction: column;
     justify-content: flex-end;
     background-color: rgb(230, 197, 15);
-    overflow-y: auto;
-    overflow-x: auto;
+    z-index: 0;
 }
-
 
 h2 {
     font-size: 2em;
@@ -75,12 +73,11 @@ h2 {
 }
 
 .box {
+    overflow: hidden;
+    position: relative;
     width: 100%;
     height: 47.5%;
     background-color: rgb(220, 220, 220, 0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
 }
 
 .futureWeather {
@@ -111,7 +108,7 @@ h2 {
 .loginDialog {
     display: none;
     position: fixed;
-    z-index: 1;
+    z-index: 3;
     left: 0;
     top: 0;
     width: 100%;
@@ -253,9 +250,9 @@ input[type=email], input[type=password] {
     z-index: -1;
 }
 
-#interpolatedPolynomialChartSmall {
-    width: 90%;
-    height: 90%;
+#hourlyForecast {
+    width: 100%;
+    height: 100%;
     padding: 10px;
     z-index: 1;
 }
@@ -272,45 +269,50 @@ input[type=email], input[type=password] {
     overflow: hidden;
     position: relative;
     display: flex;
+    flex-direction: row;
     justify-content: center;
     align-items: center;
 }
 
 #calendar {
     display: flex;
-    white-space: nowrap;
-    transition: transform 0.5s ease-in-out;
+    align-content: center;
+    align-items: center;
+    flex-grow: 1;
+    justify-content: center;
+
 }
 
 .day {
-    width: 200px;
-    opacity: 0.5;
-    transition: opacity 0.3s ease-in-out;
-}
-
-.day.active {
+    text-align: center;
     opacity: 1;
 }
 
-#prev-btn,
-#next-btn {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    cursor: pointer;
+.day.hidden {
+    opacity: 0;
+    animation: fadeInOut 2s ease;
+}
+
+@keyframes fadeInOut {
+    0%, 100% {
+        opacity: 0;
+    }
+    50% {
+        opacity: 1;
+    }
+}
+
+.arrow {
     font-size: 24px;
+    width: 30px;
+    height: 30px;
+    border: none;
+    background-color: transparent;
+    cursor: pointer;
+    margin: 20px
 }
 
-#prev-btn {
-    width:20%;
-    left: 10px;
 
-}
-
-#next-btn {
-    width:20%;
-    right: 10px;
-}
 
 #clockContainer {
     display: flex;
@@ -326,5 +328,51 @@ input[type=email], input[type=password] {
     top: 0;
     color: #333;
     position: absolute;
-    margin: 3vw; /* Opcjonalny margines dla estetyki */
+    margin: 5vw;
 }
+
+.overlay {
+    position: absolute;
+    top: 0;
+    margin: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 2;
+    display: none;
+}
+
+
+
+.slideIn {
+    animation: slideIn 1s forwards;
+}
+
+.slideOut {
+    animation: slideOut 1s forwards;
+}
+
+@keyframes slideIn {
+    0% {
+        transform: translateY(100%);
+    }
+    100% {
+        transform: translateY(0%);
+    }
+}
+
+@keyframes slideOut {
+    0% {
+        transform: translateY(0%);
+    }
+    100% {
+        transform: translateY(-100%);
+    }
+}
+
+
+.tooltip-bg {
+    fill: white;
+    stroke: black;
+    stroke-width: 1;
+}
+

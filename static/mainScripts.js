@@ -40,14 +40,12 @@ function login() {
         return response.json();
     })
     .then(data => {
-        console.log(data);
         if (data.success) {
             isLoggedIn = true;
             temperatureUnit = data.unit;
             toggleForms();
             sessionId = data.sesja;
             changeTheme(data.backgroundColor);
-            //switchWeatherUnit(data.unit);
             getWeather(data.defaultCity);
         }
         else {
@@ -82,7 +80,6 @@ function register() {
     })
         .then(response => response.json())
     .then(data => {
-        console.log(data);
         if (data.success) {
             isLoggedIn = true;
             toggleForms();
@@ -100,8 +97,6 @@ function logout() {
     changeTheme("light");
 
     temperatureUnit = 0;
-    console.log(temperatureUnit);
-    //switchWeatherUnit("0");
     getWeather(document.getElementById('city').innerText);
 
 }
@@ -136,9 +131,9 @@ function changeTheme(selectedTheme) {
         nature: '#228B22'
     };
 
-    const body = document.body;
-    body.style.transition = 'background-color 0.5s ease-in-out';
 
+    document.body.style.transition = 'background-color 0.3s ease-in-out';
+    document.getElementById('clock').style.color= '#333';
     document.body.style.backgroundColor = themeColors[selectedTheme];
 
     const h2Elements = document.querySelectorAll('h2');
@@ -146,6 +141,7 @@ function changeTheme(selectedTheme) {
     h2Elements.forEach((h2) => {
         if (selectedTheme === "dark") {
             h2.style.color = '#f0f8ff';
+            document.getElementById('clock').style.color = '#f0f8ff';
         } else {
             h2.style.color = '';
         }
@@ -156,7 +152,7 @@ function changeTheme(selectedTheme) {
     }
 
     setTimeout(() => {
-        body.style.transition = '';
+        document.body.style.transition = '';
     }, 500);
 }
 
@@ -165,8 +161,7 @@ function getWeather(miasto) {
             alert("Wprowadź nazwę miasta przed sprawdzeniem pogody.");
             return;
         }
-        getHourForecast(miasto);
-        getDailyForecast(miasto);
+
 
         fetch('/submitCity', {
             method: 'POST',
@@ -178,6 +173,10 @@ function getWeather(miasto) {
         .then(response => response.json())
         .then(data => updateWeatherElements(data))
         .catch(error => console.error('Error:', error));
+
+
+    animatedForecastChange(miasto, 'overlay_cal');
+    animatedForecastChange(miasto, 'overlay_box');
 
 }
 
@@ -199,7 +198,7 @@ function updateWeatherElements(data) {
     if (temperatureUnit === 0)
         elements.temperatureElement.innerText = `${data.temperatura_C} °C`;
     else
-        elements.temperatureElement.innerText = `${Math.round((9/5*data.temperatura_C - 32))} °F`;
+        elements.temperatureElement.innerText = `${Math.round((9/5*data.temperatura_C + 32))} °F`;
 
 
     elements.conditionsElement.innerText = data.warunki;
@@ -216,8 +215,24 @@ function updateWeatherElements(data) {
 }
 
 
-document.addEventListener("DOMContentLoaded", getWeather('Warsaw'));
+document.addEventListener("DOMContentLoaded", function() {
+    getWeather('Warsaw');
+});
 
+/*
+let resizeTimeout;
+window.addEventListener('resize', function() {
+    const miasto = document.getElementById('city').innerText;
+
+    if (resizeTimeout) {
+        clearTimeout(resizeTimeout);
+    }
+
+    resizeTimeout = setTimeout(function() {
+        animatedForecastChange(miasto, 'overlay_box');
+    }, 500);
+});
+*/
 
 function submitBackground(background) {
     fetch('/submitBackground', {
@@ -229,7 +244,7 @@ function submitBackground(background) {
     })
     .then(response => response.json())
     .then(data => {
-        console.log(data);
+        console.log("SubmitBackground udany!");
     })
     .catch(error => console.error('Error:', error));
 }
@@ -244,7 +259,7 @@ function submitNotification(value) {
     })
         .then(response => response.json())
         .then(data => {
-            console.log(data);
+            console.log("SubmitNotification udane!");
         })
         .catch(error => console.error('Error:', error));
 }
@@ -265,7 +280,7 @@ function submitTemperature(tempUnit) {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                console.log('Udało się!');
+                console.log('submitTemperature udane!');
             } else {
                 console.error('Błąd!', data);
             }
@@ -288,7 +303,7 @@ function submitDefaultCity() {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                console.log('Udało się!');
+                console.log('submitDefaultCity udane!');
             } else {
                 console.error('Błąd!', data);
             }
@@ -342,17 +357,15 @@ function getHourForecast(miasto) {
             if (data) {
                 if (temperatureUnit === 1) {
                     data.forEach(item => {
-                        item.temp = (9 / 5) * item.temp + 32;
+                        item.temp = ((9 / 5) * item.temp + 32).toFixed(1);
                     });
                 }
-                console.log(data);
-                const interpolationPoints = data.map((data, index) => ({
+                const points = data.map((data, index) => ({
                     x: index * 3,
                     y: data.temp,
                     z: data.time.slice(-5),
                 }));
-                console.log(interpolationPoints);
-                drawInterpolatedPolynomialChart("interpolatedPolynomialChartSmall",interpolationPoints, "small");
+                drawFunctionFromPoints(points);
             } else {
                 console.error('Błąd!', data);
             }
@@ -381,7 +394,6 @@ function getDailyForecast(miasto) {
                     });
                 }
                 renderCalendar(data);
-                console.log(data);
             } else {
                 console.error('Błąd!', data);
             }
@@ -394,96 +406,81 @@ function getDailyForecast(miasto) {
 
 
 function renderCalendar(forecastData) {
-    const calendarContainer = document.getElementById('dailyForecast');
+    const calendarContainer = document.getElementById('calendar-container');
     const calendar = document.getElementById('calendar');
 
-    // Usuń istniejące elementy kalendarza
     while (calendar.firstChild) {
         calendar.removeChild(calendar.firstChild);
     }
 
-    forecastData.forEach(day => {
-        const dayElement = document.createElement('div');
-        dayElement.classList.add('day');
-        if (temperatureUnit === 1)
-            dayElement.innerHTML = `
-                <h3>${day.date}</h3>
-                <p>Sunrise: ${day.sunrise}</p>
-                <p>Sunset: ${day.sunset}</p>
-                <p>Max Temp: ${day.max_temp}°F</p>
-                <p>Min Temp: ${day.min_temp}°F</p>
-                <p>Max Wind: ${day.max_wind} kph</p>
-                <p>Average Humidity: ${day.avghumidity}%</p>
-                <p>Condition: ${day.condition}</p>
-                <img src="${day.icon}" alt="${day.condition}">
-                <p>UV index: ${day.uv}</p>
-            `;
-        else
-            dayElement.innerHTML = `
-                <h3>${day.date}</h3>
-                <p>Sunrise: ${day.sunrise}</p>
-                <p>Sunset: ${day.sunset}</p>
-                <p>Max Temp: ${day.max_temp}°C</p>
-                <p>Min Temp: ${day.min_temp}°C</p>
-                <p>Max Wind: ${day.max_wind} kph</p>
-                <p>Average Humidity: ${day.avghumidity}%</p>
-                <p>Condition: ${day.condition}</p>
-                <img src="${day.icon}" alt="${day.condition}">
-                <p>UV index: ${day.uv}</p>
-            `;
+    const dayElement = document.createElement('div');
+    dayElement.classList.add('day');
 
-        calendar.appendChild(dayElement);
-    });
+    calendar.appendChild(dayElement);
 
-    const days = document.querySelectorAll('.day');
-    const prevButton = document.getElementById('prev-btn');
-    const nextButton = document.getElementById('next-btn');
+    const updateDay = (index) => {
+        const day = forecastData[index];
+        const temperatureUnitLabel = temperatureUnit === 1 ? '°F' : '°C';
+
+        dayElement.innerHTML = `
+            <h3>${day.date}</h3>
+            <p>Sunrise: ${day.sunrise}</p>
+            <p>Sunset: ${day.sunset}</p>
+            <p>Max Temp: ${day.max_temp}${temperatureUnitLabel}</p>
+            <p>Min Temp: ${day.min_temp}${temperatureUnitLabel}</p>
+            <p>Max Wind: ${day.max_wind} kph</p>
+            <p>Average Humidity: ${day.avghumidity}%</p>
+            <p>Condition: ${day.condition}</p>
+            <img src="${day.icon}" alt="${day.condition}">
+            <p>UV index: ${day.uv}</p>
+        `;
+    };
 
     let currentIndex = 0;
 
     const updateVisibility = () => {
-        days.forEach((day, index) => {
-            day.style.opacity = index === currentIndex ? 1 : 0;
-        });
+        dayElement.style.opacity = 1;
     };
 
-    const scrollCalendar = (direction) => {
-        const dayWidth = days[0].offsetWidth + 10;
+    updateDay(currentIndex);
+    updateVisibility();
+
+    document.getElementById('arrowleft').addEventListener('click', () => {
+        scrollCalendar(-1);
+    });
+
+    document.getElementById('arrowright').addEventListener('click', () => {
+        scrollCalendar(1);
+    });
+
+    window.scrollCalendar = (direction) => {
         const maxIndex = forecastData.length - 1;
 
         currentIndex = Math.max(0, Math.min(currentIndex + direction, maxIndex));
 
-        const transformValue = -currentIndex * dayWidth + 'px';
-        calendar.style.transform = `translateX(${transformValue})`;
+        const currentDay = document.querySelector('.day');
+        currentDay.classList.add('hidden');
+        updateDay(currentIndex);
 
-        prevButton.style.display = currentIndex === 0 ? 'none' : 'block';
-        nextButton.style.display = currentIndex === maxIndex ? 'none' : 'block';
+        document.getElementById('arrowleft').style.visibility = currentIndex === 0 ? 'hidden' : 'visible';
+        document.getElementById('arrowright').style.visibility = currentIndex === maxIndex ? 'hidden' : 'visible';
+
+        setTimeout(() => {
+            currentDay.classList.remove('hidden');
+        }, 300);
 
         updateVisibility();
     };
-
-    prevButton.onclick = () => scrollCalendar(-1);
-    nextButton.onclick = () => scrollCalendar(1);
-
-    prevButton.style.display = 'none';
-    nextButton.style.display = forecastData.length > 1 ? 'block' : 'none';
-
-    scrollCalendar(1);
-    scrollCalendar(-1);
-    updateVisibility();
 }
 
 function updateClock() {
-    var now = new Date();
-    var hours = now.getHours();
-    var minutes = now.getMinutes();
-    var seconds = now.getSeconds();
+    let now = new Date();
+    let hours = now.getHours();
+    let minutes = now.getMinutes();
+    let seconds = now.getSeconds();
 
-    // Formatowanie czasu do postaci hh:mm:ss
-    var formattedTime = padZero(hours) + ":" + padZero(minutes) + ":" + padZero(seconds);
 
-    // Wyświetlanie sformatowanego czasu w elemencie div
-    document.getElementById('clock').innerText = formattedTime;
+    document.getElementById('clock').innerText = padZero(hours) + ":" + padZero(minutes) + ":" + padZero(seconds);
 }
 
 function padZero(number) {
@@ -491,4 +488,27 @@ function padZero(number) {
 }
 
 setInterval(updateClock, 1000);
-updateClock();
+
+
+function animatedForecastChange(miasto, overlayId) {
+    let overlay = document.getElementById(overlayId);
+    overlay.classList.add('slideIn');
+    overlay.style.backgroundColor = document.body.style.backgroundColor;
+    overlay.style.filter = `saturate(80%)`;
+    overlay.style.display = 'block';
+
+
+    setTimeout(function () {
+        if(overlayId === 'overlay_box')
+            getHourForecast(miasto);
+        else if (overlayId === 'overlay_cal')
+            getDailyForecast(miasto);
+        overlay.classList.remove('slideIn');
+        overlay.classList.add('slideOut');
+
+        setTimeout(function () {
+            overlay.style.display = 'none';
+            overlay.classList.remove('slideOut');
+        }, 2000);
+    }, 1000);
+}

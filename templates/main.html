@@ -5,18 +5,15 @@
     <title>Weather App</title>
     <link rel="stylesheet" type="text/css" href="/static/mainStyles.css">
     <script src="https://d3js.org/d3.v6.min.js"></script>
-    <script type="text/javascript" src="/static/polyFunctions.js"></script>
-    <script type="text/javascript" src="/static/mainScripts.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-
-
 <div class="weatherContainer">
     <div class="cityInfo">
         <div id="searchContainer">
             <form id="weatherForm">
             <input type="text" id="citySearchbar" name="city" placeholder="Wpisz miasto..." value="">
-            <button type="button" onclick="getWeather(document.getElementById('citySearchbar').value); getHourForecast(document.getElementById('city').innerText)">Check the Weather!</button>
+            <button type="button" onclick="getWeather(document.getElementById('citySearchbar').value);">Check the Weather!</button>
         </form>
         </div>
         <div>
@@ -28,7 +25,7 @@
         </div>
     </div>
     <div id="clockContainer">
-<!--        <div id="clock"></div>-->
+        <div id="clock"></div>
     </div>
 
 </div>
@@ -49,13 +46,15 @@
 
         </div>
         <div class="box">
-            <svg id="interpolatedPolynomialChartSmall"></svg>
+            <div class="overlay" id="overlay_box"></div>
+            <svg id="hourlyForecast"></svg>
         </div>
     </div>
     <div class="futureWeather" id="calendar-container">
+        <div class="overlay" id="overlay_cal"></div>
+        <button class="arrow left-arrow" id="arrowleft" onclick="scrollCalendar(-1)">←</button>
         <div id="calendar"></div>
-        <div id="prev-btn" onclick="scrollCalendar(-1)">‹-</div>
-        <div id="next-btn" onclick="scrollCalendar(1)">-›</div>
+        <button class="arrow right-arrow" id="arrowright" onclick="scrollCalendar(1)">→</button>
     </div>
 </div>
 
@@ -146,7 +145,11 @@
     </form>
 </div>
 
-<svg id="interpolatedPolynomialChart" style="min-width: 100vw; position:absolute; min-height: 80vh;"></svg>
+<canvas id="interpolatedPolynomialChart" style="min-width: 100vw; position:absolute; min-height: 80vh;"></canvas>
+
+
+<script type="text/javascript" src="/static/mainScripts.js"></script>
+<script type="text/javascript" src="/static/polyFunctions.js"></script>
 
 <script>
 
@@ -164,7 +167,9 @@
 
     const randomInterpolationPoints = generateRandomPoints(8);
 
-    drawInterpolatedPolynomialChart("interpolatedPolynomialChart", randomInterpolationPoints);
+    backgroundDrawInterpolatedPolynomialChart(randomInterpolationPoints);
+
+
 </script>
 
 </body>
