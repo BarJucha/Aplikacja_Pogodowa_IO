@@ -4,7 +4,11 @@ import requests
 from getFavouriteCties import fgetFavouriteCities
 from getWeather import fgetHourForecast, fgetDailyForecast, getCurrentWeather
 from followCity import fgetFollowedCities, fRemoveCityToFollow, faddCityToFollow
-from sendEmail import send_email, getUserEmail
+from sendEmail import send_email, send_daily_email
+import schedule
+import time
+import threading
+from threading import Thread
 from login import login_blueprint
 app = Flask(__name__, static_url_path='/static')
 
