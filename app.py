@@ -22,7 +22,7 @@ def index():
 
 
 # Ustawienie, aby codziennie o 7:00 wysyłać powiadomienia
-schedule.every().day.at("21:12").do(send_daily_email, db_connection)
+schedule.every().day.at("07:00").do(send_daily_email, db_connection)
 
 # Funkcja uruchamiająca harmonogram w osobnym wątku
 def run_schedule():
