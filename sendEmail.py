@@ -9,11 +9,11 @@ def send_email(subject, body, to_email):
     # Ustawienia serwera SMTP (tutaj przykład dla Gmail)
     smtp_server = 'smtp.gmail.com'
     smtp_port = 587
-    smtp_username = 'ioweatherapp2024@gmail.com'
-    smtp_password = 'dKb^ja8M1'
+    smtp_username = read_from_file("psw.txt")
+    smtp_password = 'ojah yqyj uhuz ptxy'
 
     # Adres nadawcy
-    from_email = 'twoj@gmail.com'
+    from_email = 'ioweatherapp2024@gmail.com'
 
     # Konstrukcja wiadomości
     msg = MIMEMultipart()
@@ -32,10 +32,12 @@ def send_email(subject, body, to_email):
         # Wysłanie wiadomości
         server.sendmail(from_email, to_email, msg.as_string())
 
-
-# Funkcja zwracające email użytkownika
-def getUserEmail(db_connection, user_id):
-    query = "SELECT email FROM uzytkownik WHERE userID = %s"
-    cursor, result = db_connection.execute_query(query, user_id)
-    email = result['email']
-    return email
+def read_from_file(plik):
+    try:
+        with open(plik, "r") as file:
+            content = file.read()
+        return content
+    except FileNotFoundError:
+        return "Plik nie istnieje."
+    except Exception as e:
+        return f"Wystąpił błąd podczas odczytywania pliku: {str(e)}"
