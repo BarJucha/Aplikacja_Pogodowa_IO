@@ -19,7 +19,7 @@ def fgetHourForecast(miasto):
         j = 0
         result_data = []
         result_data.append({'time': "now", 'temp': current_temp, 'icon': current_icon})
-        while(count < 9):
+        while(count < 8):
             epoch = weather_data['forecast']['forecastday'][i]['hour'][j]['time_epoch']
             if epoch > current_epoch:
                 time = weather_data['forecast']['forecastday'][i]['hour'][j]['time']

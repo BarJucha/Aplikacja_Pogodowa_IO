@@ -10,10 +10,10 @@ def send_email(subject, body, to_email):
     smtp_server = 'smtp.gmail.com'
     smtp_port = 587
     smtp_username = 'ioweatherapp2024@gmail.com'
-    smtp_password = 'dKb^ja8M1'
+    smtp_password = 'ojah yqyj uhuz ptxy'
 
     # Adres nadawcy
-    from_email = 'twoj@gmail.com'
+    from_email = 'ioweatherapp2024@gmail.com'
 
     # Konstrukcja wiadomości
     msg = MIMEMultipart()
@@ -35,7 +35,11 @@ def send_email(subject, body, to_email):
 
 # Funkcja zwracające email użytkownika
 def getUserEmail(db_connection, user_id):
-    query = "SELECT email FROM uzytkownik WHERE userID = %s"
-    cursor, result = db_connection.execute_query(query, user_id)
-    email = result['email']
-    return email
+    query = "SELECT * FROM uzytkownik WHERE userID = %s"
+    result = db_connection.execute_query(query, (user_id,))
+    if result is not None:
+        email = result[0]['email']  
+        return email
+    else:
+        print("Nie znaleziono wyników dla podanego userID.")
+        return None

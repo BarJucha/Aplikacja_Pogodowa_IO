@@ -88,12 +88,29 @@ def submitNotification():
         db_connection.execute_query(query, data)
 
         if notification == 1:
-            user_email = getUserEmail(db_connection, user_id)
+            query = "SELECT * FROM uzytkownik WHERE userID = %s"
+            cursor, result = db_connection.execute_query(query, (user_id,))
+            user_email = result[0]['email']
             send_email("Zmiana ustawień powiadomień", "Włączyłeś powiadomienia", user_email)
 
         return jsonify({'success': True, 'notification': notification})
     else:
         return jsonify({'success': False, 'user_id': 'no in session'})
+
+
+# Endpoint obługujący zapisanie default city
+@app.route('/submitDefaultCity', methods=['POST'])
+def submitDefaultCity():
+    if 'user_id' in session:
+        user_id = session['user_id']
+        data = request.get_json()
+        default = data.get('city')
+        query = "UPDATE uzytkownik SET miasto = %s WHERE userID = %s"
+        qData = (default, user_id)
+        db_connection.execute_query(query, qData)
+        return jsonify({'success': True, 'miasto': default})
+    else:
+        return jsonify({'success': False})
 
 # Endpoint obsługujący dodanie ulubionego miasta użytkownika do bazy danych
 @app.route('/addCityToFavourite', methods=['POST', 'GET'])
